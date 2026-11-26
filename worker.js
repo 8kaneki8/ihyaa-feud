@@ -27,7 +27,7 @@ function json(data,status=200){return new Response(JSON.stringify(data),{status,
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function safeRoom(v){return /^[A-Z0-9]{4,8}$/.test(v||"")}
 function cleanName(v,fallback){return String(v||fallback).trim().slice(0,32)||fallback}
-function normalizeAnswer(value){return String(value||"").toLowerCase().normalize("NFKD").replace(/[\\u064B-\\u065F\\u0670\\u0640]/g,"").replace(/[أإآٱ]/g,"ا").replace(/ى/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[^\\p{L}\\p{N}]+/gu," ").trim().replace(/\\s+/g," ")}
+function normalizeAnswer(value){return String(value||"").toLowerCase().normalize("NFKD").replace(/[\u064B-\u065F\u0670\u0640]/g,"").replace(/[أإآٱ]/g,"ا").replace(/ى/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[^\p{L}\p{N}]+/gu," ").trim().replace(/\s+/g," ")}
 function findAnswer(question,guess){const value=normalizeAnswer(guess);if(!value)return -1;return question.answers.findIndex(x=>[x.text,...(x.aliases||[])].some(v=>normalizeAnswer(v)===value))}
 
 export default {
