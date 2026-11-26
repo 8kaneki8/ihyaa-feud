@@ -85,7 +85,7 @@ export class MatchRoom {
  publicState(includePrivate=false){
   if(!this.data)return null;
   const s=clone(this.data);
-  if(!includePrivate){delete s.history;delete s.log;s.questions=s.questions.map(q=>({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)?a:{text:null,points:null,aliases:[]})}));}
+  if(!includePrivate){delete s.history;delete s.log;const mask=q=>q?({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)?a:{text:null,points:null,aliases:[]})}):null;s.questions=s.questions.map(mask);s.currentQuestion=mask(s.currentQuestion);}
   return s;
  }
  async persist(){this.data.updatedAt=Date.now();await this.state.storage.put("match",this.data);}
@@ -120,7 +120,7 @@ export class MatchRoom {
    case "addPoints":{const n=Number(a.points);if(!Number.isInteger(n)||n<=0||n>100000)throw Error("أدخل عدد نقاط صحيحًا أكبر من صفر");team(a.team).score+=n;this.logEvent("إضافة نقاط يدوية",team(a.team).name+" +"+n);break;}
    case "deductPoints":{const n=Number(a.points);if(!Number.isInteger(n)||n<=0||n>100000)throw Error("أدخل عدد نقاط صحيحًا أكبر من صفر");team(a.team).score=Math.max(0,team(a.team).score-n);this.logEvent("خصم نقاط",team(a.team).name+" -"+n);break;}
    case "adjustScore":{const n=Number(a.score);if(!Number.isInteger(n)||n<0||n>1000000)throw Error("النتيجة غير صالحة");team(a.team).score=n;this.logEvent("تعديل النتيجة",team(a.team).name+" = "+n);break;}
-   case "timer": if(a.action==="start")s.timer.running=true;else if(a.action==="pause")s.timer.running=false;else if(a.action==="reset"){s.timer.running=false;s.timer.remaining=s.timer.duration;}else throw Error("أمر مؤقت غير صالح");this.logEvent("تحديث المؤقت",a.action);break;
+   case "timer": if(a.action==="start"){s.timer.running=true;this.state.storage.setAlarm(Date.now()+1000);}else if(a.action==="pause"){s.timer.running=false;this.state.storage.deleteAlarm();}else if(a.action==="reset"){s.timer.running=false;s.timer.remaining=s.timer.duration;this.state.storage.deleteAlarm();}else throw Error("أمر مؤقت غير صالح");this.logEvent("تحديث المؤقت",a.action);break;
    case "skip": s.phase="roundEnd";s.status="roundEnd";s.timer.running=false;this.logEvent("تخطي السؤال");break;
    case "next": s.round++;s.currentQuestion=null;s.phase="setup";s.status="playing";s.activeTeam=null;s.revealed=[];s.strikes=0;s.bank=0;s.timer.running=false;this.logEvent("الانتقال للسؤال التالي");break;
    case "finishMatch": s.status="finished";s.phase="finished";s.timer.running=false;this.logEvent("إنهاء المباراة");break;
@@ -128,7 +128,8 @@ export class MatchRoom {
    default: throw Error("عملية غير مدعومة");
   }
  }
- finishRound(teamId){if(teamId){const t=this.data.teams.find(x=>x.id===teamId);if(t)t.score+=this.data.bank;}this.data.bank=0;this.data.phase="roundEnd";this.data.status="roundEnd";this.data.timer.running=false;this.logEvent("انتهاء الجولة");}
+ finishRound(teamId){if(teamId){const t=this.data.teams.find(x=>x.id===teamId);if(t)t.score+=this.data.bank;}this.data.bank=0;this.data.phase="roundEnd";this.data.status="roundEnd";this.data.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("انتهاء الجولة");}
+ async alarm(){await this.ready;if(!this.data?.timer?.running)return;this.data.timer.remaining=Math.max(0,this.data.timer.remaining-1);if(this.data.timer.remaining===0){this.data.timer.running=false;this.logEvent("انتهاء الوقت");}else{await this.state.storage.setAlarm(Date.now()+1000);}await this.persist();this.broadcast();}
  onMessage(ws,raw,isHost){
   if(!isHost){try{ws.send(JSON.stringify({type:"error",error:"وضع العرض فقط"}))}catch{}return}
   try{const a=JSON.parse(raw);this.apply(a);this.persist().then(()=>this.broadcast()).catch(()=>{});}
