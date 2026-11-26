@@ -14,6 +14,15 @@ A real-time, two-team quiz game with a public game screen and a private host con
 4. Open the local URL. Create a match from the host console.
 
 ## Public deployment
+
+### Automatic deployment from GitHub
+1. Open Cloudflare Dashboard → Workers & Pages → Create application → GitHub.
+2. Authorize GitHub if asked, then select `8kaneki8/ihyaa-feud` and branch `main`.
+3. Keep the project root at `/` and the Worker name as `ihyaa-feud` (it must match `wrangler.toml`).
+4. Set the build command to `npm install` and the deploy command to `npm run deploy` (or `npx wrangler deploy`). No framework build command is required.
+5. Save and deploy. Later pushes to `main` can trigger automatic deployments.
+
+### Manual deployment from your computer
 1. Create or log in to a Cloudflare account.
 2. From this repository, run `npm install`.
 3. Run `npx wrangler login`.
