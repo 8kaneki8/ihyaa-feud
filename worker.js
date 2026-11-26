@@ -109,7 +109,7 @@ export class MatchRoom {
     s.currentQuestion=clone(found);s.revealed=[];s.strikes=0;s.bank=0;s.activeTeam=null;s.phase="faceoff";s.status="playing";s.faceoff={firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null};s.timer.remaining=s.timer.duration;s.timer.running=false;this.logEvent("بدء السؤال",found.question);break;
    }
    case "buzz": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);s.faceoff.firstBuzz=a.team;this.logEvent("تسجيل ضغطة الجرس",team(a.team).name);break;
-   case "faceAnswer": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);{const ans=q().answers[a.answerIndex];if(!ans)throw Error("اختر إجابة صحيحة");s.faceoff.answers[a.team]=a.answerIndex;this.logEvent("تسجيل إجابة المواجهة",team(a.team).name+" — "+ans.text);}break;
+   case "faceAnswer": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);{const index=a.answer!==undefined?findAnswer(q(),a.answer):Number(a.answerIndex);const ans=q().answers[index];if(!ans)throw Error("الإجابة غير موجودة في لوحة الإجابات");s.faceoff.answers[a.team]=index;this.logEvent("تسجيل إجابة المواجهة",team(a.team).name+" — "+ans.text);}break;
    case "resolveFaceoff":{
     const A=s.faceoff.answers.A,B=s.faceoff.answers.B;if(A===null||B===null)throw Error("سجل إجابة الفريقين أولًا");
     const ap=q().answers[A].points,bp=q().answers[B].points;if(ap===bp)throw Error("الإجابتان متعادلتان؛ اختر الفريق يدويًا");s.faceoff.winner=ap>bp?"A":"B";s.phase="choice";this.logEvent("حسم المواجهة",team(s.faceoff.winner).name);break;
