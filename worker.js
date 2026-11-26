@@ -85,7 +85,7 @@ export class MatchRoom {
  publicState(includePrivate=false){
   if(!this.data)return null;
   const s=clone(this.data);
-  if(!includePrivate){delete s.history;delete s.log;const mask=q=>q?({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)?a:{text:null,points:null,aliases:[]})}):null;s.questions=s.questions.map(mask);s.currentQuestion=mask(s.currentQuestion);}
+  if(!includePrivate){delete s.history;delete s.log;const mask=q=>q?({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);}
   return s;
  }
  async persist(){this.data.updatedAt=Date.now();await this.state.storage.put("match",this.data);}
@@ -95,7 +95,7 @@ export class MatchRoom {
  apply(a){
   if(!a||typeof a.type!=="string")throw Error("عملية غير معروفة");
   const s=this.data;
-  if(a.type==="undo"){const prev=s.history.pop();if(!prev)throw Error("لا توجد عملية للتراجع عنها");const history=s.history;this.data={...prev,history};this.logEvent("تراجع","استعادة الحالة السابقة");return}
+  if(a.type==="undo"){const prev=s.history.pop();if(!prev)throw Error("لا توجد عملية للتراجع عنها");const history=s.history;this.data={...prev,history};if(this.data.timer.running)this.state.storage.setAlarm(Date.now()+1000);else this.state.storage.deleteAlarm();this.logEvent("تراجع","استعادة الحالة السابقة");return}
   this.snapshot();
   const team=id=>{const t=s.teams.find(x=>x.id===id);if(!t)throw Error("اختر فريقًا صحيحًا");return t};
   const q=()=>{if(!s.currentQuestion)throw Error("لا يوجد سؤال نشط");return s.currentQuestion};
