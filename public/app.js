@@ -19,6 +19,21 @@ function animateAnswerReveal(index){const row=document.querySelector('[data-answ
 function confettiBurst(){const layer=ensureFxLayer();layer.innerHTML='<div class="confetti-burst">'+Array.from({length:46},(_,i)=>'<i style="--i:'+i+'"></i>').join("")+'</div>';layer.classList.remove("fx-active");void layer.offsetWidth;layer.classList.add("fx-active");setTimeout(()=>layer.classList.remove("fx-active"),3600)}
 function teamCard(t){return '<div class="team-card '+(state.activeTeam===t.id?'active':'')+'"><div class="team-name">'+esc(t.name)+'</div><div class="score">'+t.score+'</div><div class="small">'+(t.players||[]).map(esc).join(" • ")+'</div></div>'}
 function board(){const q=state.currentQuestion;if(!q)return '<div class="notice">لم يبدأ الهوست السؤال بعد.</div>';const faceoffAnswers=state.phase==="faceoff"?Object.values(state.faceoff?.answers||{}).filter(x=>x!==null&&x!==undefined):[];return '<div class="answers">'+q.answers.map((a,i)=>{const revealed=state.revealed.includes(i);const faceoffSelected=faceoffAnswers.includes(i);const shown=revealed||faceoffSelected;return '<div class="answer '+(revealed?'revealed':faceoffSelected?'faceoff-selected':'hidden')+'" data-answer-index="'+i+'"><span class="rank">'+(i+1)+'</span><b class="answer-text">'+(shown?esc(a.text):"") +'</b><span class="points">'+(shown? a.points+" نقطة":"") +'</span></div>'}).join("")+'</div>'}
+function completedQuestionHistory(){
+ const items=[...(state.completedQuestions||[])].reverse();
+ if(!items.length)return "";
+ return '<section class="completed-history"><div class="section-title"><h3>الأسئلة السابقة</h3><span class="badge">'+items.length+' سؤال</span></div>'+
+  items.map(entry=>{
+   const q=entry.question||{};
+   const visible=(entry.revealed||[]).concat(Object.values(entry.faceoffAnswers||{}).filter(i=>Number.isInteger(i)));
+   const answers=(q.answers||[]).map((a,i)=>{
+    const shown=visible.includes(i)&&a.text;
+    return '<div class="answer '+(shown?'revealed':'hidden')+'" style="min-height:42px;padding:8px 12px"><span class="rank">'+(i+1)+'</span><b class="answer-text">'+(shown?esc(a.text):'إجابة مخفية')+'</b><span class="points">'+(shown?Number(a.points||0)+' نقطة':'—')+'</span></div>';
+   }).join('');
+   const result=entry.result||{};
+   return '<article class="panel completed-question" style="margin-top:12px;padding:16px"><div class="category">السؤال السابق · الجولة '+Number(entry.round||0)+'</div><h3 style="margin:8px 0 12px">'+esc(q.question||'سؤال سابق')+'</h3><div class="answers">'+answers+'</div><div class="small" style="margin-top:10px">'+(result.reason==='skipped'?'تم تخطي السؤال':'انتهت الجولة · النقاط المعتمدة: '+Number(result.awarded||0))+'</div></article>';
+  }).join('')+'</section>';
+}
 function renderGame(){
  const q=state.currentQuestion;
  const finished=state.status==="finished"||state.phase==="finished";
@@ -39,7 +54,7 @@ function renderGame(){
    '<div class="teamboard">'+teamCard(state.teams[0])+'<div class="versus">VS</div>'+teamCard(state.teams[1])+'</div>'+
    (finished?'<div class="panel winner">🏆 '+esc(state.teams[0].score===state.teams[1].score?"تعادل رائع!":(state.teams[0].score>state.teams[1].score?state.teams[0].name:state.teams[1].name)+" يفوز بالمباراة!")+'</div>':'')+
    (q?'<section class="question"><div class="category">'+esc((state.categories.find(c=>c.id===q.category)||{}).name||"السؤال")+' · الجولة '+state.round+'</div><h2>'+esc(q.question)+'</h2></section>':'<section class="question"><div class="category">بانتظار السؤال</div><h2>استعدوا للتحدّي</h2></section>')+
-   activeBanner+phaseNotice+board()+
+   activeBanner+phaseNotice+board()+completedQuestionHistory()+
    '<div class="strikes" aria-label="الأخطاء">'+Array.from({length:state.maxStrikes},(_,i)=>'<div class="strike '+(i<state.strikes?'on':'')+'">'+(i<state.strikes?'×':'')+'</div>').join("")+'</div>'+
    '<div class="public-status"><span class="badge">بنك الجولة: <b>'+Number(state.bank||0)+'</b></span><span class="badge">'+esc(phaseLabel(state.phase))+'</span><span class="badge">المضاعف ×'+Number(state.multiplier||1)+'</span></div>'+
   '</div>');
