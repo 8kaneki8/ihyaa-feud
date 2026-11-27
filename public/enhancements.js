@@ -19,7 +19,7 @@ renderHost=function(){
    const shown=state.revealed.includes(i);
    const action=shown?"hide":"reveal";
    const label=shown?"إخفاء":"كشف";
-   const allowed=state.phase==="playing"||state.phase==="roundEnd"||state.phase==="steal";
+   const allowed=state.phase==="playing";
    return '<div class="host-answer-row"><div class="host-answer-copy"><b>'+String(i+1).padStart(2,"0")+'. '+esc(a.text)+'</b><small>'+Number(a.points||0)+' نقطة'+(shown?' · مكشوفة':' · مخفية')+'</small></div>'+(allowed?'<button class="'+(shown?'hide':'reveal')+'" data-host-answer="'+action+'" data-answer-index="'+i+'">'+label+'</button>':'<span class="small">للهوست</span>')+'</div>';
   }).join(""):'<div class="host-answer-empty">ابدأ سؤالًا لعرض الإجابات السرية هنا.</div>';
   const active=state.teams.find(t=>t.id===state.activeTeam);
