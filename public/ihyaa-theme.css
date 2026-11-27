@@ -50,3 +50,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 .host-answer-empty{color:var(--muted);font-size:12px;padding:12px}
 @media(max-width:650px){.host-answer-list{grid-template-columns:1fr}.teamboard{gap:8px}.team-card{padding:16px 10px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+.team-card.is-buzzing.team-red{border:2px solid #ff6678;box-shadow:0 0 0 4px #ef526633,0 0 38px #ef526666;animation:ihyaaBuzzPulse 1s ease-in-out infinite}
+.team-card.is-buzzing.team-blue{border:2px solid #65b5ff;box-shadow:0 0 0 4px #4b9be833,0 0 38px #4b9be866;animation:ihyaaBuzzPulse 1s ease-in-out infinite}
+@keyframes ihyaaBuzzPulse{50%{transform:translateY(-3px) scale(1.012)}}
