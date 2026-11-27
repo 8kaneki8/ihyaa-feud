@@ -16,7 +16,7 @@ const DEMO_QUESTIONS = [
 
 const freshState = () => ({
   room: "", status:"lobby", phase:"setup", round:1,
-  teams:[{id:"A",name:"الفريق الأول",players:[],score:0},{id:"B",name:"الفريق الثاني",players:[],score:0}],
+  teams:[{id:"A",name:"الفريق الأحمر",players:[],score:0},{id:"B",name:"الفريق الأزرق",players:[],score:0}],
   categories:CATEGORIES, questions:DEMO_QUESTIONS, questionIndex:0, currentQuestion:null,
   activeTeam:null, faceoff:{firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null},
   revealed:[], strikes:0, maxStrikes:3, bank:0, multiplier:1, roundMultipliers:[1,2,3,3], roundHistory:[],
