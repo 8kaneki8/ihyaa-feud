@@ -118,7 +118,7 @@ export class MatchRoom {
  publicState(includePrivate=false){
   if(!this.data)return null;
   const s=clone(this.data);
-  if(!includePrivate){delete s.history;delete s.log;const mask=q=>q?({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);}
+  if(!includePrivate){delete s.history;delete s.log;const faceoffSelected=new Set(Object.values(s.faceoff?.answers||{}).filter(i=>Number.isInteger(i)));const mask=q=>q?({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)||(q.id===s.currentQuestion?.id&&faceoffSelected.has(i))?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);}
   return s;
  }
  async persist(){this.data.updatedAt=Date.now();await this.state.storage.put("match",this.data);}
