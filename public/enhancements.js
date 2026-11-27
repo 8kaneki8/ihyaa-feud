@@ -28,10 +28,16 @@ renderHost=function(){
  const aside=layout.querySelector(":scope > aside");
  if(aside){
   aside.insertAdjacentHTML("afterbegin",'<section class="panel ihyaa-multiplier-panel"><div class="section-title"><h3>مضاعف الجولة</h3><span class="badge">×'+Number(state.multiplier||1)+'</span></div><div class="field"><label>اختيار المضاعف</label><select id="ihyaaMultiplier"><option value="1" '+(state.multiplier===1?'selected':'')+'>×1 — عادي</option><option value="2" '+(state.multiplier===2?'selected':'')+'>×2 — مضاعف</option><option value="3" '+(state.multiplier===3?'selected':'')+'>×3 — نهائي</option></select></div><button class="btn secondary" data-host-multiplier style="margin-top:10px;width:100%">تطبيق المضاعف</button></section>');
+  aside.insertAdjacentHTML("afterbegin",'<section class="panel"><div class="section-title"><h3>التحكم في الدور والأخطاء</h3></div><div class="field"><label>نقل الدور إلى</label><select id="ihyaaTeamChoice"><option value="A">الفريق الأحمر</option><option value="B">الفريق الأزرق</option></select></div><button class="btn secondary" data-host-set-team style="margin-top:8px;width:100%">تعيين الفريق النشط</button><div class="divider"></div><div class="toolbar"><button class="btn danger" data-host-strike>＋ Strike</button><button class="btn secondary" data-host-remove-strike>إزالة Strike</button><button class="btn secondary" data-host-reset-strikes>تصفير الأخطاء</button></div><button class="btn primary" data-host-trigger-steal style="margin-top:8px;width:100%">بدء فرصة السرقة يدويًا</button></section>');
  }
 };
 app.addEventListener("click",e=>{
  const answer=e.target.closest("[data-host-answer]");
  if(answer){const i=Number(answer.dataset.answerIndex);act(answer.dataset.hostAnswer==="hide"?"hideAnswer":"reveal",{answerIndex:i});return;}
- if(e.target.closest("[data-host-multiplier]")){act("setMultiplier",{multiplier:Number($("#ihyaaMultiplier").value)});}
+ if(e.target.closest("[data-host-multiplier]")){act("setMultiplier",{multiplier:Number($("#ihyaaMultiplier").value)});return;}
+ if(e.target.closest("[data-host-set-team]")){act("setActiveTeam",{team:$("#ihyaaTeamChoice").value});return;}
+ if(e.target.closest("[data-host-strike]")){act("strike");return;}
+ if(e.target.closest("[data-host-remove-strike]")){act("removeStrike");return;}
+ if(e.target.closest("[data-host-reset-strikes]")){act("resetStrikes");return;}
+ if(e.target.closest("[data-host-trigger-steal]")){act("triggerSteal");return;}
 });
