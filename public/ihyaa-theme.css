@@ -152,3 +152,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 @keyframes ihyaaCinematicSpark{0%{transform:scale(0);opacity:0}35%{transform:scale(1.4);opacity:1}100%{transform:scale(.2);opacity:0}}
 @keyframes ihyaaCinematicLabel{0%{opacity:0;transform:translateY(8px)}35%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
 @media(prefers-reduced-motion:reduce){.game-stage.cinematic-enter .question,.game-stage.cinematic-enter .question:before,.game-stage.cinematic-enter .question:after,.game-stage.cinematic-enter .question .category,.game-stage.cinematic-enter .question h2,.cinematic-sweep,.cinematic-sweep:before,.cinematic-sweep:after,.cinematic-sweep span,.cinematic-sweep i,.cinematic-sweep b{animation:none!important}}
+
+/* Public face-off answer preview: visible to viewers immediately, without scoring it yet */
+.game-stage .answer.faceoff-selected{border-color:#e8d9b2;background:linear-gradient(120deg,#4b4260,#243b59);box-shadow:0 0 0 1px #e8bd6877,0 0 28px #d7bd8244;color:#fff}
+.game-stage .answer.faceoff-selected .rank{background:#e8bd6830;color:#ffe7b5}
+.game-stage .answer.faceoff-selected .points{color:#ffe1a0}
