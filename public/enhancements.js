@@ -10,10 +10,10 @@ const ihyaaOriginalRenderHost=renderHost;
 renderHost=function(){
  ihyaaOriginalRenderHost();
  const layout=app.querySelector(".host-layout");
+ if(!layout)return;
  layout.classList.add("host-dashboard");
  layout.querySelector(":scope > section.panel")?.classList.add("host-main-panel");
  layout.querySelector(":scope > aside")?.classList.add("host-sidebar");
- if(!layout)return;
  const mainPanel=layout.querySelector(":scope > section.panel");
  const stack=mainPanel?.querySelector(".control-stack");
  if(stack){
