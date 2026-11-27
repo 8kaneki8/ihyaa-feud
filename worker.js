@@ -119,7 +119,7 @@ export class MatchRoom {
  publicState(includePrivate=false){
   if(!this.data)return null;
   const s=clone(this.data);
-  if(!includePrivate){delete s.history;delete s.log;const faceoffSelected=new Set(Object.values(s.faceoff?.answers||{}).filter(i=>Number.isInteger(i)));const mask=(q,visible=new Set())=>q?({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)||(q.id===s.currentQuestion?.id&&faceoffSelected.has(i))||visible.has(i)?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);s.completedQuestions=(s.completedQuestions||[]).map(entry=>{const visible=new Set([...(entry.revealed||[]),...Object.values(entry.faceoffAnswers||{}).filter(i=>Number.isInteger(i))]);return {...entry,question:mask(entry.question,visible)};});}
+  if(!includePrivate){delete s.history;delete s.log;const faceoffSelected=new Set(Object.values(s.faceoff?.answers||{}).filter(i=>Number.isInteger(i)));const mask=(q,visible=new Set())=>q?({...q,answers:q.answers.map((a,i)=>((q.id===s.currentQuestion?.id&&s.revealed.includes(i))||(q.id===s.currentQuestion?.id&&faceoffSelected.has(i))||visible.has(i))?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);s.completedQuestions=(s.completedQuestions||[]).map(entry=>{const visible=new Set([...(entry.revealed||[]),...Object.values(entry.faceoffAnswers||{}).filter(i=>Number.isInteger(i))]);return {...entry,question:mask(entry.question,visible)};});}
   return s;
  }
  async persist(){this.data.updatedAt=Date.now();await this.state.storage.put("match",this.data);}
