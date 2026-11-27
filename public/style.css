@@ -31,3 +31,5 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 @keyframes ihyaaPop{from{opacity:0;transform:translateY(28px) scale(.75)}70%{transform:translateY(-4px) scale(1.04)}to{opacity:1;transform:none}}
 @keyframes ihyaaConfetti{to{top:110%;transform:translateY(20px) rotate(760deg);opacity:.1}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.host-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}.host-layout{align-items:start}.host-layout aside{min-width:0}.host-layout .panel{margin-bottom:14px}@media(max-width:760px){.host-topline{align-items:stretch;flex-direction:column}.host-topline .btn{width:100%}}
