@@ -86,7 +86,7 @@ function renderGame(){
    '<div class="public-status"><span class="badge">بنك الجولة: <b>'+Number(state.bank||0)+'</b></span><span class="badge">'+esc(phaseLabel(state.phase))+'</span><span class="badge">المضاعف ×'+Number(state.multiplier||1)+'</span></div>'+
   '</div>');
 }
-function phaseLabel(p){return ({setup:"جاهز",faceoff:"المواجهة",choice:"اختيار اللعب أو التمرير",playing:"اللعب",steal:"فرصة السرقة",roundEnd:"نهاية الجولة",finished:"انتهت المباراة"})[p]||p}
+function phaseLabel(p){return ({setup:"جاهز",faceoff:"المواجهة",choice:"اختيار اللعب أو التمرير",playing:"اللعب",steal:"فرصة السرقة",roundEnd:"نهاية الجولة",fastMoney:"Fast Money",fastMoneyResult:"نتيجة Fast Money",finished:"انتهت المباراة"})[p]||p}
 function btn(label,type,data={},cls="secondary",confirmText=""){return '<button class="btn '+cls+'" data-action="'+type+'" '+Object.entries(data).map(([k,v])=>'data-'+k+'="'+esc(v)+'"').join(" ")+' '+(confirmText?'data-confirm="'+esc(confirmText)+'"':'')+'>'+label+'</button>'}
 function renderHost(){const q=state.currentQuestion;let questions=state.questions;let controls='';
 if(state.phase==="setup"){controls='<div class="field"><label>اختيار السؤال</label><select id="questionSelect">'+questions.map(x=>'<option value="'+x.id+'">'+esc(x.question)+'</option>').join("")+'</select></div>'+btn("بدء السؤال","start")+'<div class="small">ابدأ سؤالًا جديدًا من بنك الأسئلة.</div>'}
