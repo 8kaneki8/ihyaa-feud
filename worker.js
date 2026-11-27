@@ -50,7 +50,7 @@ const freshState = () => ({
   categories:CATEGORIES, questions:DEMO_QUESTIONS, questionIndex:0, currentQuestion:null, completedQuestions:[],
   activeTeam:null, faceoff:{firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null},
   revealed:[], strikes:0, maxStrikes:3, bank:0, multiplier:1, roundMultipliers:[1,2,3,3], roundHistory:[], roundResult:null, steal:{team:null,attempted:false,success:null,answer:null},
-  timer:{duration:30,remaining:30,running:false}, fastMoney:{enabled:false,target:200,active:false,player:1,answers:[[],[]],seconds:20},
+  timer:{duration:30,remaining:30,running:false}, fastMoney:{enabled:false,target:200,active:false,team:null,players:["",""],questionIds:[],questionIndex:0,player:0,answers:[[],[]],scores:[0,0],seconds:[20,25],results:[]},
   history:[], log:[], updatedAt:Date.now()
 });
 
@@ -119,7 +119,7 @@ export class MatchRoom {
  publicState(includePrivate=false){
   if(!this.data)return null;
   const s=clone(this.data);
-  if(!includePrivate){delete s.history;delete s.log;const faceoffSelected=new Set(Object.values(s.faceoff?.answers||{}).filter(i=>Number.isInteger(i)));const mask=(q,visible=new Set())=>q?({...q,answers:q.answers.map((a,i)=>((q.id===s.currentQuestion?.id&&s.revealed.includes(i))||(q.id===s.currentQuestion?.id&&faceoffSelected.has(i))||visible.has(i))?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);s.completedQuestions=(s.completedQuestions||[]).map(entry=>{const visible=new Set([...(entry.revealed||[]),...Object.values(entry.faceoffAnswers||{}).filter(i=>Number.isInteger(i))]);return {...entry,question:mask(entry.question,visible)};});}
+  if(!includePrivate){delete s.history;delete s.log;const faceoffSelected=new Set(Object.values(s.faceoff?.answers||{}).filter(i=>Number.isInteger(i)));const mask=(q,visible=new Set())=>q?({...q,answers:q.answers.map((a,i)=>((q.id===s.currentQuestion?.id&&s.revealed.includes(i))||(q.id===s.currentQuestion?.id&&faceoffSelected.has(i))||visible.has(i))?a:{text:null,points:null,aliases:[]})}):null;const fm=s.fastMoney||{};if(s.phase==="fastMoney"){const q=(s.questions||[]).find(x=>x.id===fm.questionIds?.[fm.questionIndex]);s.fastMoney={...fm,question:q?{id:q.id,category:q.category,question:q.question}:null,answers:[[],[]],results:[]};}else if(s.phase==="fastMoneyResult"){s.fastMoney={...fm,question:null};}s.questions=[];s.currentQuestion=mask(s.currentQuestion);s.completedQuestions=(s.completedQuestions||[]).map(entry=>{const visible=new Set([...(entry.revealed||[]),...Object.values(entry.faceoffAnswers||{}).filter(i=>Number.isInteger(i))]);return {...entry,question:mask(entry.question,visible)};});}
   return s;
  }
  async persist(){this.data.updatedAt=Date.now();await this.state.storage.put("match",this.data);}
@@ -147,7 +147,7 @@ export class MatchRoom {
     s.currentQuestion=clone(found);s.revealed=[];s.strikes=0;s.bank=0;s.roundResult=null;s.steal={team:null,attempted:false,success:null,answer:null};s.activeTeam=null;s.phase="faceoff";s.status="playing";s.faceoff={firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null};s.timer.remaining=s.timer.duration;s.timer.running=false;this.logEvent("بدء السؤال",found.question);break;
    }
    case "buzz": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);if(s.faceoff.firstBuzz)throw Error("تم تسجيل الفريق الذي ضغط الجرس أولًا بالفعل");s.faceoff.firstBuzz=a.team;this.logEvent("تحديد الفريق الذي يبدأ الاختيار",team(a.team).name);break;
-   case "faceAnswer": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);{const first=s.faceoff.firstBuzz;const other=first==="A"?"B":"A";if(first&&a.team!==first&&s.faceoff.answers[first]===null)throw Error("سجل إجابة الفريق الذي يبدأ الاختيار أولًا");const index=a.answer!==undefined?findAnswer(q(),a.answer):Number(a.answerIndex);const ans=q().answers[index];if(!ans)throw Error("الإجابة غير موجودة في لوحة الإجابات");if(s.faceoff.answers[a.team]!==null)throw Error("تم تسجيل إجابة هذا الفريق بالفعل");s.faceoff.answers[a.team]=index;this.logEvent("تسجيل إجابة المواجهة",team(a.team).name+" — رقم "+(index+1)+": "+ans.text);}break;
+   case "faceAnswer": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);{const first=s.faceoff.firstBuzz;const other=first==="A"?"B":"A";if(first&&a.team!==first&&s.faceoff.answers[first]===null)throw Error("سجل إجابة الفريق الذي يبدأ الاختيار أولًا");const index=a.answer!==undefined?findAnswer(q(),a.answer):Number(a.answerIndex);const ans=q().answers[index];if(!ans)throw Error("الإجابة غير موجودة في لوحة الإجابات");if(s.faceoff.answers[a.team]!==null)throw Error("تم تسجيل إجابة هذا الفريق بالفعل");s.faceoff.answers[a.team]=index;this.logEvent("تسجيل إجابة المواجهة",team(a.team).name+" — رقم "+(index+1)+": "+ans.text);if(index===0){s.faceoff.winner=a.team;s.phase="choice";this.logEvent("حسم المواجهة تلقائيًا","الإجابة الأولى — "+team(a.team).name+" اختار المركز الأول");}else if(s.faceoff.answers.A!==null&&s.faceoff.answers.B!==null){const A=s.faceoff.answers.A,B=s.faceoff.answers.B;if(A!==B){s.faceoff.winner=A<B?"A":"B";s.phase="choice";this.logEvent("حسم المواجهة تلقائيًا",team(s.faceoff.winner).name+" — الإجابة الأعلى ترتيبًا");}else{this.logEvent("تعادل المواجهة","الفريقان اختارا نفس الترتيب؛ يلزم حسم الهوست");}}}break;
    case "resolveFaceoff":{
     const first=s.faceoff.firstBuzz;const other=first==="A"?"B":"A";const firstIndex=first?s.faceoff.answers[first]:null;const otherIndex=s.faceoff.answers[other];
     if(first&&firstIndex===null)throw Error("سجل إجابة الفريق الذي يبدأ الاختيار أولًا");
@@ -170,13 +170,44 @@ export class MatchRoom {
    case "timer": if(a.action==="start"){s.timer.running=true;this.state.storage.setAlarm(Date.now()+1000);}else if(a.action==="pause"){s.timer.running=false;this.state.storage.deleteAlarm();}else if(a.action==="reset"){s.timer.running=false;s.timer.remaining=s.timer.duration;this.state.storage.deleteAlarm();}else throw Error("أمر مؤقت غير صالح");this.logEvent("تحديث المؤقت",a.action);break;
    case "skip": if(["setup","roundEnd","finished"].includes(s.phase))throw Error("لا يوجد سؤال نشط لتخطيه");if(s.phase==="steal")throw Error("يجب حسم فرصة السرقة قبل إنهاء الجولة");s.roundResult={round:s.round,bank:s.bank,multiplier:s.multiplier,awarded:0,winner:null,reason:"skipped"};archiveQuestion(s,s.roundResult);s.roundHistory.push({...s.roundResult});s.bank=0;s.phase="roundEnd";s.status="roundEnd";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("تخطي السؤال","لم تُحتسب نقاط البنك");break;
    case "next": if(s.phase!=="roundEnd")throw Error("يجب إنهاء الجولة الحالية أولًا");s.round++;s.multiplier=Number(a.multiplier)||s.roundMultipliers[s.round-1]||1;s.currentQuestion=null;s.roundResult=null;s.steal={team:null,attempted:false,success:null,answer:null};s.phase="setup";s.status="playing";s.activeTeam=null;s.revealed=[];s.strikes=0;s.bank=0;s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("الانتقال للسؤال التالي","الجولة "+s.round+" — المضاعف ×"+s.multiplier);break;
-   case "finishMatch": if(s.phase==="steal")throw Error("احسم محاولة السرقة أولًا قبل إنهاء المباراة");if(["faceoff","choice","playing"].includes(s.phase))this.finishRound(s.activeTeam,"match-ended");s.status="finished";s.phase="finished";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("إنهاء المباراة");break;
+   case "startFastMoney":{
+    if(s.phase!=="roundEnd")throw Error("يمكن بدء Fast Money بعد انتهاء جولة فقط");
+    const ids=Array.isArray(a.questionIds)?a.questionIds.map(String):[];
+    if(ids.length!==5||new Set(ids).size!==5||ids.some(id=>!s.questions.some(q=>q.id===id)))throw Error("اختر خمسة أسئلة مختلفة من بنك الأسئلة");
+    const leader=s.teams[0].score===s.teams[1].score?null:(s.teams[0].score>s.teams[1].score?"A":"B");
+    const selectedTeam=a.team||leader;if(!["A","B"].includes(selectedTeam))throw Error("اختر الفريق الذي سيخوض Fast Money");
+    const playerOne=cleanName(a.playerOne,s.teams.find(t=>t.id===selectedTeam).players?.[0]||"اللاعب الأول");
+    const playerTwo=cleanName(a.playerTwo,s.teams.find(t=>t.id===selectedTeam).players?.[1]||"اللاعب الثاني");
+    s.fastMoney={enabled:true,target:200,active:true,team:selectedTeam,players:[playerOne,playerTwo],questionIds:ids,questionIndex:0,player:0,answers:[[],[]],scores:[0,0],seconds:[20,25],results:[]};
+    s.phase="fastMoney";s.status="playing";s.currentQuestion=null;s.activeTeam=selectedTeam;s.timer={duration:20,remaining:20,running:false};
+    this.state.storage.deleteAlarm();this.logEvent("بدء Fast Money",team(selectedTeam).name+" — "+playerOne+" ثم "+playerTwo);break;
+   }
+   case "fastMoneyAnswer":{
+    if(s.phase!=="fastMoney"||!s.fastMoney?.active)throw Error("مرحلة Fast Money غير نشطة");
+    this.recordFastMoneyAnswer(String(a.answer||""));
+    break;
+   }
+   case "finishMatch": if(s.phase==="steal")throw Error("احسم محاولة السرقة أولًا قبل إنهاء المباراة");if(s.phase==="fastMoney")throw Error("أكمل Fast Money أولًا");if(["faceoff","choice","playing"].includes(s.phase))this.finishRound(s.activeTeam,"match-ended");s.status="finished";s.phase="finished";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("إنهاء المباراة");break;
    case "restartQuestion": if(!s.currentQuestion)throw Error("لا يوجد سؤال لإعادته");s.revealed=[];s.strikes=0;s.bank=0;s.roundResult=null;s.steal={team:null,attempted:false,success:null,answer:null};s.phase="faceoff";s.status="playing";s.activeTeam=null;s.faceoff={firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null};this.logEvent("إعادة السؤال");break;
    default: throw Error("عملية غير مدعومة");
   }
  }
+ recordFastMoneyAnswer(response){
+  const s=this.data,fm=s.fastMoney;if(s.phase!=="fastMoney"||!fm?.active)return;
+  const question=s.questions.find(q=>q.id===fm.questionIds[fm.questionIndex]);if(!question)throw Error("سؤال Fast Money غير موجود");
+  const clean=String(response||"").trim().slice(0,120),index=findAnswer(question,clean);
+  if(fm.player===1&&clean){const previous=fm.answers[0][fm.questionIndex];if(previous&&normalizeAnswer(previous.response)===normalizeAnswer(clean))throw Error("لا يمكن تكرار إجابة اللاعب الأول — اختر إجابة مختلفة");if(previous&&index>=0&&previous.answerIndex===index)throw Error("هذه الإجابة استخدمها اللاعب الأول — اختر إجابة مختلفة");}
+  const points=index>=0?Number(question.answers[index].points)||0:0;
+  fm.answers[fm.player][fm.questionIndex]={response:clean,answerIndex:index>=0?index:null,matchedText:index>=0?question.answers[index].text:null,points};
+  fm.scores[fm.player]+=points;this.logEvent("إجابة Fast Money",fm.players[fm.player]+" — السؤال "+(fm.questionIndex+1)+" — "+(points?("+"+points):"0"));
+  fm.questionIndex++;
+  if(fm.questionIndex>=5){
+   if(fm.player===0){fm.player=1;fm.questionIndex=0;s.timer={duration:25,remaining:25,running:false};this.state.storage.deleteAlarm();this.logEvent("انتقال Fast Money","انتهى اللاعب الأول — يبدأ اللاعب الثاني");}
+   else{fm.active=false;fm.results=fm.questionIds.map((id,i)=>{const q=s.questions.find(x=>x.id===id);return {question:q?.question||"سؤال",players:[fm.answers[0][i],fm.answers[1][i]]};});s.phase="fastMoneyResult";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("انتهاء Fast Money","الإجمالي "+(fm.scores[0]+fm.scores[1])+" / "+fm.target);}
+  }
+ }
  finishRound(teamId,reason="completed",details={}){const s=this.data;if(s.phase==="roundEnd")return;const bank=Number(s.bank)||0;const multiplier=Number(s.multiplier)||1;const award=reason==="steal-failed"?0:bank*multiplier;if(teamId){const t=s.teams.find(x=>x.id===teamId);if(t)t.score+=award;}s.roundResult={round:s.round,bank,multiplier,awarded:award,winner:teamId,reason,...details};archiveQuestion(s,s.roundResult);s.roundHistory.push({round:s.round,bank,multiplier,awarded:award,winner:teamId,reason});s.bank=0;s.phase="roundEnd";s.status="roundEnd";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("انتهاء الجولة",reason==="steal-failed"?"فشلت السرقة وتم إلغاء نقاط الجولة":teamId?"تم اعتماد "+award+" نقطة للفريق الفائز (×"+multiplier+")":"انتهت الجولة دون نقاط");}
- async alarm(){await this.ready;if(!this.data?.timer?.running)return;this.data.timer.remaining=Math.max(0,this.data.timer.remaining-1);if(this.data.timer.remaining===0){this.data.timer.running=false;this.logEvent("انتهاء الوقت");}else{await this.state.storage.setAlarm(Date.now()+1000);}await this.persist();this.broadcast();}
+ async alarm(){await this.ready;if(!this.data?.timer?.running)return;this.data.timer.remaining=Math.max(0,this.data.timer.remaining-1);if(this.data.timer.remaining===0){this.data.timer.running=false;this.logEvent("انتهاء الوقت");if(this.data.phase==="fastMoney"&&this.data.fastMoney?.active){while(this.data.fastMoney.questionIndex<5&&this.data.phase==="fastMoney")this.recordFastMoneyAnswer("");if(this.data.phase==="fastMoney"&&this.data.fastMoney.player===1){this.data.timer.running=true;await this.state.storage.setAlarm(Date.now()+1000);}}}else{await this.state.storage.setAlarm(Date.now()+1000);}await this.persist();this.broadcast();}
  onMessage(ws,raw,isHost){
   if(!isHost){try{ws.send(JSON.stringify({type:"error",error:"وضع العرض فقط"}))}catch{}return}
   try{const a=JSON.parse(raw);this.apply(a);this.persist().then(()=>this.broadcast()).catch(()=>{});}
