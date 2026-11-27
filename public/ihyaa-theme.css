@@ -54,3 +54,53 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 .team-card.is-buzzing.team-red{border:2px solid #ff6678;box-shadow:0 0 0 4px #ef526633,0 0 38px #ef526666;animation:ihyaaBuzzPulse 1s ease-in-out infinite}
 .team-card.is-buzzing.team-blue{border:2px solid #65b5ff;box-shadow:0 0 0 4px #4b9be833,0 0 38px #4b9be866;animation:ihyaaBuzzPulse 1s ease-in-out infinite}
 @keyframes ihyaaBuzzPulse{50%{transform:translateY(-3px) scale(1.012)}}
+
+
+/* Round settlement, steal clarity, and public-stage polish */
+.game-stage{max-width:1120px;margin:0 auto}
+.game-stage .teamboard{gap:clamp(8px,2vw,20px);margin:22px 0}
+.game-stage .team-card{min-height:142px;display:flex;flex-direction:column;justify-content:center;gap:5px}
+.game-stage .score{font-variant-numeric:tabular-nums;text-shadow:0 5px 24px #0005}
+.game-stage .question{padding:clamp(22px,4vw,42px);margin:22px 0 18px;box-shadow:0 18px 50px #0003}
+.game-stage .question h2{max-width:900px}
+.game-stage .answers{gap:12px}
+.game-stage .answer{min-height:72px;padding:14px 18px;border-radius:15px;box-shadow:0 8px 24px #0002}
+.game-stage .answer .rank{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#d7bd8218;font-size:15px}
+.game-stage .answer.hidden{border-color:#6a86a455;background:linear-gradient(120deg,#18395d,#102a49)}
+.game-stage .answer.revealed{background:linear-gradient(120deg,#355578,#183653);border-color:#e8d9b2;box-shadow:0 0 24px #d7bd8244}
+.active-turn{display:flex;justify-content:center;align-items:center;gap:12px;margin:14px auto;padding:10px 18px;width:max-content;max-width:100%;border:1px solid #d7bd8277;border-radius:999px;background:#d7bd8217;color:#dceaff}
+.active-turn span{font-size:11px;color:var(--muted)}
+.active-turn b{color:var(--gold-light)}
+.phase-banner{display:flex;align-items:center;gap:15px;padding:16px 20px;margin:16px auto;border-radius:18px;max-width:900px;border:1px solid var(--line);background:linear-gradient(110deg,#102b4b,#0b203b);box-shadow:0 14px 36px #0003}
+.phase-banner .phase-icon{width:48px;height:48px;flex:0 0 48px;border-radius:14px;display:grid;place-items:center;background:#d7bd8222;color:var(--gold-light);font-size:25px}
+.phase-banner b{font-size:17px;color:#fff}
+.phase-banner p{margin:4px 0 0;color:#c7d8ed;font-size:13px;line-height:1.8}
+.steal-banner{border-color:#e8bd68aa;background:linear-gradient(110deg,#4a3425,#1a2b42);animation:stealGlow 1.8s ease-in-out infinite}
+.steal-banner .phase-icon{background:#e8bd6830;color:#ffe1a0}
+.result-banner{border-color:#8bd9b377;background:linear-gradient(110deg,#174536,#102b3c)}
+.neutral-banner{opacity:.85}
+.public-status{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:20px auto}
+.public-status .badge{padding:9px 15px;font-size:12px;border:1px solid #8daecc33;background:#173653}
+.public-status .badge:first-child{border-color:#d7bd8277;color:#f1dfb5}
+.strikes{margin:22px auto}
+.round-bank-card,.round-result-panel{display:grid;gap:6px;padding:17px 18px;border-radius:16px;border:1px solid #d7bd8255;background:linear-gradient(130deg,#183a5d,#102742);text-align:center}
+.round-bank-card span,.round-result-panel span{font-size:12px;color:#c1d3e8}
+.round-bank-card strong,.round-result-panel b{font:800 28px Alexandria,Tahoma,sans-serif;color:var(--gold-light);font-variant-numeric:tabular-nums}
+.round-bank-card small,.round-result-panel small{color:#a9bfd9;font-size:11px}
+.round-result-panel{border-color:#9ad7b477;background:linear-gradient(130deg,#164333,#102b3c);margin-bottom:12px}
+.round-result-panel strong{font-size:18px;color:#f4fff9}
+.steal-control{display:grid;gap:12px}
+.steal-target{display:grid;gap:5px;text-align:center;padding:14px;border:1px solid #e8bd6877;border-radius:14px;background:#e8bd6812}
+.steal-target span{font-size:11px;color:var(--muted)}
+.steal-target strong{font:700 20px Alexandria,Tahoma,sans-serif;color:#ffe1a0}
+.host-layout .round-bank-card{margin:4px 0 8px}
+.host-layout .round-bank-card strong{font-size:24px}
+.host-layout .round-result-panel{margin-bottom:10px}
+.host-layout .steal-control .btn{width:100%}
+@keyframes stealGlow{0%,100%{box-shadow:0 10px 30px #e8bd6810}50%{box-shadow:0 10px 38px #e8bd6840}}
+@media(max-width:760px){
+ .game-stage .team-card{min-height:116px;padding:14px 8px}
+ .game-stage .answer{min-height:64px}
+ .phase-banner{padding:13px}
+ .active-turn{width:100%;justify-content:center}
+}
