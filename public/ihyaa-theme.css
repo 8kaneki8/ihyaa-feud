@@ -104,3 +104,51 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
  .phase-banner{padding:13px}
  .active-turn{width:100%;justify-content:center}
 }
+
+
+/* Face-off: both teams submit before the ranking decides who owns the question */
+.faceoff-intro{padding:16px 18px;border:1px solid #d7bd8277;border-radius:16px;background:linear-gradient(120deg,#1d3e61,#172943);margin-bottom:14px}
+.faceoff-intro b{color:#f5dfad;font-size:17px}
+.faceoff-intro p{color:#c7d8ed;font-size:12px;line-height:1.9;margin:6px 0 0}
+.faceoff-turn{display:grid;gap:4px;padding:14px;border:1px solid #d7bd8277;border-radius:14px;background:#d7bd8214;text-align:center;margin:14px 0}
+.faceoff-turn span,.faceoff-turn small{font-size:11px;color:#b9cce2}
+.faceoff-turn strong{font-size:20px;color:#ffe1a0}
+.faceoff-scoreboard{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;gap:10px;margin:18px 0}
+.faceoff-team{display:grid;align-content:center;justify-items:center;gap:8px;min-width:0;padding:16px 10px;border:1px solid #8daecc44;border-radius:16px;background:linear-gradient(145deg,#102b49,#0b2038);text-align:center}
+.faceoff-team:first-child{border-color:#ef526677;background:linear-gradient(145deg,#4c2639,#1d2039)}
+.faceoff-team:last-child{border-color:#4b9be877;background:linear-gradient(145deg,#17466e,#102844)}
+.faceoff-team>span{font-size:12px;color:#dceaff;font-weight:700}
+.faceoff-choice{font-size:13px;color:#fff;line-height:1.7;overflow-wrap:anywhere}
+.faceoff-points{font-size:11px;color:#f2d89e}
+.faceoff-pending{font-size:12px;color:#91a9c5}
+.faceoff-vs{align-self:center;color:#e8d9b2;font-weight:900;font-size:13px;text-shadow:0 0 16px #e8bd6866}
+.faceoff-comparison{display:grid;gap:5px;text-align:center;padding:15px;border:1px solid #8bd9b377;border-radius:15px;background:linear-gradient(120deg,#174536,#102b3c);margin:12px 0}
+.faceoff-comparison b{color:#c8f4dc;font-size:15px}
+.faceoff-comparison small{color:#c0d8cb;font-size:11px}
+.faceoff-comparison.is-tied{border-color:#e8bd6877;background:#493822}
+.faceoff-comparison.is-tied b{color:#ffe1a0}
+@media(max-width:520px){.faceoff-scoreboard{gap:5px}.faceoff-team{padding:12px 6px}.faceoff-choice{font-size:11px}.faceoff-vs{font-size:10px}}
+
+/* Cinematic question reveal on the public display */
+.game-stage.cinematic-enter .question{position:relative;isolation:isolate;overflow:hidden;animation:ihyaaQuestionCinematic 1.35s cubic-bezier(.16,1,.3,1) both;border-color:#f1d89b;box-shadow:0 0 0 1px #e8bd6844,0 0 70px #d7bd8244,0 24px 70px #0008}
+.game-stage.cinematic-enter .question:before{content:"";position:absolute;inset:-2px;z-index:-1;background:linear-gradient(110deg,transparent 15%,#f8e6bb44 48%,transparent 78%);transform:translateX(-120%);animation:ihyaaQuestionSweep 1.15s .12s ease-out both}
+.game-stage.cinematic-enter .question:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(ellipse at 50% 50%,#e8bd681f,transparent 68%);animation:ihyaaQuestionGlow 1.5s ease both}
+.game-stage.cinematic-enter .question .category{animation:ihyaaQuestionText .7s .2s both}
+.game-stage.cinematic-enter .question h2{animation:ihyaaQuestionTitle .9s .25s cubic-bezier(.16,1,.3,1) both;text-shadow:0 0 26px #e8bd6866}
+.cinematic-sweep{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at center,#1b3457bb 0%,#07172fc9 68%,#07172f00 100%);animation:ihyaaCinematicCurtain 1.55s ease both}
+.cinematic-sweep:before,.cinematic-sweep:after{content:"";position:absolute;left:-15%;width:130%;height:1px;background:linear-gradient(90deg,transparent,#e8d9b2,#fff4d4,#e8d9b2,transparent);box-shadow:0 0 18px #e8bd68;transform:rotate(-8deg) scaleX(.1);animation:ihyaaCinematicLine .85s .12s ease-out both}
+.cinematic-sweep:after{transform:rotate(8deg) scaleX(.1);animation-delay:.24s}
+.cinematic-sweep span{width:min(46vw,360px);height:min(46vw,360px);border:1px solid #e8d9b266;border-radius:50%;box-shadow:0 0 50px #e8bd6822,inset 0 0 50px #e8bd6818;animation:ihyaaCinematicRing 1.15s ease-out both}
+.cinematic-sweep i{position:absolute;width:10px;height:10px;border-radius:50%;background:#ffe9b2;box-shadow:0 0 24px 8px #e8bd68;animation:ihyaaCinematicSpark 1s ease-out both}
+.cinematic-sweep b{position:absolute;top:calc(50% + min(25vw,190px));font-size:11px;letter-spacing:3px;color:#f4dfb1;opacity:0;animation:ihyaaCinematicLabel .8s .25s ease both}
+@keyframes ihyaaQuestionCinematic{0%{opacity:0;transform:perspective(1000px) translateY(48px) scale(.78) rotateX(12deg);filter:blur(12px)}55%{opacity:1;transform:perspective(1000px) translateY(-7px) scale(1.025) rotateX(0);filter:blur(0)}78%{transform:translateY(2px) scale(.995)}100%{opacity:1;transform:translateY(0) scale(1);filter:none}}
+@keyframes ihyaaQuestionSweep{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+@keyframes ihyaaQuestionGlow{0%,100%{opacity:0}35%{opacity:1}}
+@keyframes ihyaaQuestionText{from{opacity:0;transform:translateY(12px);letter-spacing:5px}to{opacity:1;transform:translateY(0);letter-spacing:normal}}
+@keyframes ihyaaQuestionTitle{0%{opacity:0;transform:scale(.88) translateY(16px);filter:blur(8px)}70%{opacity:1;transform:scale(1.025) translateY(0);filter:blur(0)}100%{opacity:1;transform:scale(1)}}
+@keyframes ihyaaCinematicCurtain{0%{opacity:0}18%{opacity:1}72%{opacity:1}100%{opacity:0}}
+@keyframes ihyaaCinematicLine{0%{transform:rotate(-8deg) scaleX(.05);opacity:0}40%{opacity:1}100%{transform:rotate(-8deg) scaleX(1);opacity:0}}
+@keyframes ihyaaCinematicRing{0%{transform:scale(.25);opacity:0}35%{opacity:1}100%{transform:scale(1.45);opacity:0}}
+@keyframes ihyaaCinematicSpark{0%{transform:scale(0);opacity:0}35%{transform:scale(1.4);opacity:1}100%{transform:scale(.2);opacity:0}}
+@keyframes ihyaaCinematicLabel{0%{opacity:0;transform:translateY(8px)}35%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+@media(prefers-reduced-motion:reduce){.game-stage.cinematic-enter .question,.game-stage.cinematic-enter .question:before,.game-stage.cinematic-enter .question:after,.game-stage.cinematic-enter .question .category,.game-stage.cinematic-enter .question h2,.cinematic-sweep,.cinematic-sweep:before,.cinematic-sweep:after,.cinematic-sweep span,.cinematic-sweep i,.cinematic-sweep b{animation:none!important}}
