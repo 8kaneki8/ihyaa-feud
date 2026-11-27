@@ -4,7 +4,7 @@ teamCard=function(t){
  const color=t.id==="A"?"red":"blue";
  const active=state.activeTeam===t.id;
  const buzz=state.phase==="faceoff"&&state.faceoff?.firstBuzz===t.id;
- return '<div class="team-card team-'+color+(active?' active':'')+(buzz?' is-buzzing':'')+'"><div class="team-name">'+esc(t.name)+'</div><div class="score">'+t.score+'</div><div class="small">'+(t.players||[]).map(esc).join(" • ")+'</div><div class="team-turn-pill '+color+'">'+(buzz?'ضغط الجرس أولًا':active?'دور الفريق الآن':color==="red"?"الفريق الأحمر":"الفريق الأزرق")+'</div></div>';
+ return '<div class="team-card team-'+color+(active?' active':'')+(buzz?' is-buzzing':'')+'"><div class="team-name">'+esc(t.name)+'</div><div class="score">'+t.score+'</div><div class="small">'+(t.players||[]).map(esc).join(" • ")+'</div><div class="team-turn-pill '+color+'">'+(buzz?'يبدأ الاختيار أولًا':active?'دور الفريق الآن':color==="red"?"الفريق الأحمر":"الفريق الأزرق")+'</div></div>';
 };
 const ihyaaOriginalRenderHost=renderHost;
 renderHost=function(){

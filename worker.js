@@ -145,13 +145,13 @@ export class MatchRoom {
     const found=s.questions.find(x=>x.id===a.questionId);if(!found)throw Error("السؤال غير موجود");
     s.currentQuestion=clone(found);s.revealed=[];s.strikes=0;s.bank=0;s.roundResult=null;s.steal={team:null,attempted:false,success:null,answer:null};s.activeTeam=null;s.phase="faceoff";s.status="playing";s.faceoff={firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null};s.timer.remaining=s.timer.duration;s.timer.running=false;this.logEvent("بدء السؤال",found.question);break;
    }
-   case "buzz": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);if(s.faceoff.firstBuzz)throw Error("تم تسجيل الفريق الذي ضغط الجرس أولًا بالفعل");s.faceoff.firstBuzz=a.team;this.logEvent("تسجيل ضغطة الجرس",team(a.team).name);break;
-   case "faceAnswer": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);{const first=s.faceoff.firstBuzz;const other=first==="A"?"B":"A";if(first&&a.team!==first&&s.faceoff.answers[first]===null)throw Error("سجل إجابة الفريق الذي ضغط الجرس أولًا");if(first&&a.team!==first&&s.faceoff.answers[first]===0)throw Error("الفريق الأول قدم أعلى إجابة بالفعل");const index=a.answer!==undefined?findAnswer(q(),a.answer):Number(a.answerIndex);const ans=q().answers[index];if(!ans)throw Error("الإجابة غير موجودة في لوحة الإجابات");if(s.faceoff.answers[a.team]!==null)throw Error("تم تسجيل إجابة هذا الفريق بالفعل");s.faceoff.answers[a.team]=index;this.logEvent("تسجيل إجابة المواجهة",team(a.team).name+" — رقم "+(index+1)+": "+ans.text);if(index===0){const firstTeam=s.faceoff.firstBuzz;if(a.team===firstTeam||(firstTeam&&s.faceoff.answers[firstTeam]!==null)){s.faceoff.winner=a.team;s.phase="choice";this.logEvent("حسم المواجهة تلقائيًا",team(a.team).name+" — الإجابة رقم 1");}}}break;
+   case "buzz": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);if(s.faceoff.firstBuzz)throw Error("تم تسجيل الفريق الذي ضغط الجرس أولًا بالفعل");s.faceoff.firstBuzz=a.team;this.logEvent("تحديد الفريق الذي يبدأ الاختيار",team(a.team).name);break;
+   case "faceAnswer": if(s.phase!=="faceoff")throw Error("المواجهة غير نشطة");team(a.team);{const first=s.faceoff.firstBuzz;const other=first==="A"?"B":"A";if(first&&a.team!==first&&s.faceoff.answers[first]===null)throw Error("سجل إجابة الفريق الذي يبدأ الاختيار أولًا");const index=a.answer!==undefined?findAnswer(q(),a.answer):Number(a.answerIndex);const ans=q().answers[index];if(!ans)throw Error("الإجابة غير موجودة في لوحة الإجابات");if(s.faceoff.answers[a.team]!==null)throw Error("تم تسجيل إجابة هذا الفريق بالفعل");s.faceoff.answers[a.team]=index;this.logEvent("تسجيل إجابة المواجهة",team(a.team).name+" — رقم "+(index+1)+": "+ans.text);}break;
    case "resolveFaceoff":{
     const first=s.faceoff.firstBuzz;const other=first==="A"?"B":"A";const firstIndex=first?s.faceoff.answers[first]:null;const otherIndex=s.faceoff.answers[other];
-    if(first&&firstIndex===null)throw Error("سجل إجابة الفريق الذي ضغط الجرس أولًا");
-    if(first&&firstIndex===0){s.faceoff.winner=first;s.phase="choice";this.logEvent("حسم المواجهة",team(first).name+" — الإجابة الأعلى ترتيبًا");break;}
-    if(first&&otherIndex===null)throw Error("امنح الفريق المنافس فرصته لتقديم إجابة");
+    if(first&&firstIndex===null)throw Error("سجل إجابة الفريق الذي يبدأ الاختيار أولًا");
+    
+    if(first&&otherIndex===null)throw Error("سجل إجابة الفريق الثاني قبل حسم المواجهة");
     const A=s.faceoff.answers.A,B=s.faceoff.answers.B;if(A===null||B===null)throw Error("سجل إجابة الفريقين أو استخدم الحسم اليدوي");
     if(A===B)throw Error("الفريقان اختارا نفس ترتيب الإجابة؛ اختر الفائز يدويًا");s.faceoff.winner=A<B?"A":"B";s.phase="choice";this.logEvent("حسم المواجهة",team(s.faceoff.winner).name);break;
    }
