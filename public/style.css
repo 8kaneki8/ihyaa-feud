@@ -33,3 +33,65 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 .host-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}.host-layout{align-items:start}.host-layout aside{min-width:0}.host-layout .panel{margin-bottom:14px}@media(max-width:760px){.host-topline{align-items:stretch;flex-direction:column}.host-topline .btn{width:100%}}
+
+
+/* Viewport-fitted match and host layouts */
+body:has(.app-shell){height:100dvh;min-height:0;overflow:hidden}
+#app:has(.app-shell){height:100dvh;min-height:0;overflow:hidden}
+.app-shell{height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:clamp(10px,1.5vh,18px) clamp(12px,2vw,26px);gap:clamp(7px,1vh,12px)}
+.shell-heading{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;min-height:42px;padding:0 4px}
+.shell-heading h2{margin:0;font:700 clamp(18px,2.1vh,24px) Changa}
+.shell-heading .eyebrow{font-size:10px;letter-spacing:1.3px}
+.shell-body{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.game-stage{height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:clamp(7px,1vh,12px);padding:2px 3px 8px}
+.game-stage .teamboard{flex:0 0 auto;margin:0;gap:10px}
+.game-stage .team-card{padding:clamp(9px,1.5vh,16px)}
+.game-stage .score{font-size:clamp(30px,5vh,48px)}
+.game-stage .question{flex:0 0 auto;margin:0;padding:clamp(10px,1.8vh,20px)}
+.game-stage .question h2{font-size:clamp(18px,2.7vh,28px);line-height:1.35}
+.game-stage .active-turn,.game-stage .phase-banner{flex:0 0 auto;margin:0;padding:9px 14px}
+.game-stage .answers{flex:0 0 auto;gap:8px}
+.game-stage .answer{min-height:clamp(42px,6vh,56px);padding:8px 12px}
+.game-stage .strikes{flex:0 0 auto;margin:2px 0;gap:8px}
+.game-stage .strike{width:34px;height:34px}
+.game-stage .public-status{flex:0 0 auto;margin-top:auto;padding-top:3px}
+.completed-history{flex:0 0 auto;margin-top:3px}
+.completed-history>summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid var(--line);border-radius:11px;background:#211b36;color:var(--gold2);font-weight:700;list-style-position:inside}
+.completed-history-list{max-height:42vh;overflow:auto;display:grid;gap:8px;padding:8px 2px}
+.completed-question{padding:12px 14px!important}
+.completed-question h3{margin:5px 0 8px;font:700 16px Changa}
+.completed-question .answers{grid-template-columns:repeat(2,minmax(0,1fr))}
+.host-topline{flex:0 0 auto;margin:0 0 6px}
+.host-topline .badge,.host-topline .btn{font-size:11px;padding:8px 12px}
+.shell-body:has(.host-layout){overflow:hidden}
+.shell-body:has(.host-layout)>.teamboard{flex:0 0 auto;margin:0 0 8px}
+.shell-body:has(.host-layout)>.teamboard .team-card{padding:8px 14px}
+.shell-body:has(.host-layout)>.teamboard .score{font-size:clamp(28px,4vh,40px)}
+.host-layout{flex:1 1 auto;min-height:0;overflow:hidden;grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);gap:12px}
+.host-layout>section{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:clamp(12px,1.5vh,18px)}
+.host-layout>aside{min-height:0;max-height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 3px 8px 0;gap:9px}
+.host-layout .panel{margin:0;padding:clamp(12px,1.5vh,18px);border-radius:16px}
+.host-layout .section-title{margin-bottom:9px}
+.host-layout .section-title h3{font-size:17px}
+.host-layout .field input,.host-layout .field select,.host-layout .field textarea{padding:8px 10px}
+.host-layout .btn{padding:9px 13px;font-size:12px}
+.host-layout .divider{margin:10px 0}
+.host-layout .question-bank-list{max-height:190px;overflow:auto}
+.host-layout .log{max-height:150px}
+@media(max-width:760px){
+ .app-shell{padding:8px;gap:6px}
+ .shell-heading{min-height:34px}
+ .shell-body:has(.host-layout){overflow:auto}
+ .shell-body:has(.host-layout)>.teamboard{margin-bottom:8px}
+ .host-layout{display:grid;grid-template-columns:1fr;overflow:visible}
+ .host-layout>section,.host-layout>aside{overflow:visible;max-height:none}
+ .host-layout>aside{padding:0}
+ .game-stage .answers,.completed-question .answers{grid-template-columns:1fr}
+}
+@media(max-height:700px) and (min-width:761px){
+ .app-shell{padding-top:6px;padding-bottom:6px;gap:5px}
+ .game-stage .team-card{padding:7px 12px}
+ .game-stage .question{padding:8px 14px}
+ .game-stage .answer{min-height:38px;padding:6px 10px}
+ .host-layout .panel{padding:10px}
+}
