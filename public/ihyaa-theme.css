@@ -159,8 +159,8 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opa
 .game-stage .answer.faceoff-selected .points{color:#ffe1a0}
 
 /* Host dashboard hierarchy and stable answer presentation */
-main:has(.app-shell){width:100%;height:100dvh;min-height:0;margin:0;padding:0;overflow:hidden}
-.app-shell{width:100%;max-width:none}
+main:has(.app-shell){width:100%;height:calc(100dvh - 78px);min-height:0;margin:0;padding:0;overflow:hidden}
+.app-shell{width:100%;max-width:none;height:100%;min-height:0}
 .host-dashboard.host-layout{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);align-items:stretch}
 .host-dashboard>.host-main-panel{min-width:0;border-color:#a9c8ed55;background:linear-gradient(155deg,#102d4e,#091f39);box-shadow:0 20px 55px #0004}
 .host-dashboard>.host-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;align-items:start;gap:10px;overflow-y:auto;padding:0 4px 10px 0}
@@ -177,5 +177,5 @@ main:has(.app-shell){width:100%;height:100dvh;min-height:0;margin:0;padding:0;ov
 .strike-flight{position:fixed;z-index:150;width:48px;height:48px;display:grid;place-items:center;border-radius:14px;border:1px solid #ff8b9b;background:radial-gradient(circle at 35% 25%,#ffb4c0,#8e2947 72%);box-shadow:0 0 20px #ff526caa,0 0 55px #ff526c66;color:white;font:900 34px Alexandria,Tahoma,sans-serif;pointer-events:none;text-shadow:0 2px 8px #4c1026}
 .game-stage .strike.on{box-shadow:0 0 20px #ff526c77,inset 0 0 14px #ffb1c022}
 @media(max-width:980px){.host-dashboard.host-layout{grid-template-columns:minmax(0,1fr) minmax(0,.9fr)}.host-dashboard>.host-sidebar{grid-template-columns:1fr}.host-dashboard>.host-sidebar>.panel{grid-column:1/-1}}
-@media(max-width:760px){main:has(.app-shell){height:auto;min-height:100dvh;overflow:visible}.app-shell{height:auto;min-height:100dvh;overflow:visible}.shell-body:has(.host-layout){overflow:visible}.host-dashboard.host-layout{display:grid;grid-template-columns:1fr;overflow:visible}.host-dashboard>.host-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;max-height:none;padding:0}.host-dashboard>.host-sidebar>.panel{grid-column:auto}.host-dashboard>.host-sidebar>.panel:nth-child(3),.host-dashboard>.host-sidebar>.panel:nth-child(4),.host-dashboard>.host-sidebar>.panel:nth-child(5),.host-dashboard>.host-sidebar>.panel:nth-child(7),.host-dashboard>.host-sidebar>.panel:nth-child(8){grid-column:1/-1}}
+@media(max-width:760px){main:has(.app-shell){height:auto;min-height:calc(100dvh - 66px);overflow:visible}.app-shell{height:auto;min-height:100%;overflow:visible}.shell-body:has(.host-layout){overflow:visible}.host-dashboard.host-layout{display:grid;grid-template-columns:1fr;overflow:visible}.host-dashboard>.host-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;max-height:none;padding:0}.host-dashboard>.host-sidebar>.panel{grid-column:auto}.host-dashboard>.host-sidebar>.panel:nth-child(3),.host-dashboard>.host-sidebar>.panel:nth-child(4),.host-dashboard>.host-sidebar>.panel:nth-child(5),.host-dashboard>.host-sidebar>.panel:nth-child(7),.host-dashboard>.host-sidebar>.panel:nth-child(8){grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){.strike-flight{display:none!important}}
