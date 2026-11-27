@@ -175,7 +175,7 @@ export class MatchRoom {
     const ids=Array.isArray(a.questionIds)?a.questionIds.map(String):[];
     if(ids.length!==5||new Set(ids).size!==5||ids.some(id=>!s.questions.some(q=>q.id===id)))throw Error("اختر خمسة أسئلة مختلفة من بنك الأسئلة");
     const leader=s.teams[0].score===s.teams[1].score?null:(s.teams[0].score>s.teams[1].score?"A":"B");
-    const selectedTeam=a.team||leader;if(!["A","B"].includes(selectedTeam))throw Error("اختر الفريق الذي سيخوض Fast Money");
+    const selectedTeam=a.team||leader;if(!["A","B"].includes(selectedTeam))throw Error("اختر الفريق الذي سيخوض Fast Money");if(leader&&selectedTeam!==leader)throw Error("يتأهل صاحب النتيجة الأعلى فقط إلى Fast Money");
     const playerOne=cleanName(a.playerOne,s.teams.find(t=>t.id===selectedTeam).players?.[0]||"اللاعب الأول");
     const playerTwo=cleanName(a.playerTwo,s.teams.find(t=>t.id===selectedTeam).players?.[1]||"اللاعب الثاني");
     s.fastMoney={enabled:true,target:200,active:true,team:selectedTeam,players:[playerOne,playerTwo],questionIds:ids,questionIndex:0,player:0,answers:[[],[]],scores:[0,0],seconds:[20,25],results:[]};
