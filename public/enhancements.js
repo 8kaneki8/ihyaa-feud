@@ -10,6 +10,9 @@ const ihyaaOriginalRenderHost=renderHost;
 renderHost=function(){
  ihyaaOriginalRenderHost();
  const layout=app.querySelector(".host-layout");
+ layout.classList.add("host-dashboard");
+ layout.querySelector(":scope > section.panel")?.classList.add("host-main-panel");
+ layout.querySelector(":scope > aside")?.classList.add("host-sidebar");
  if(!layout)return;
  const mainPanel=layout.querySelector(":scope > section.panel");
  const stack=mainPanel?.querySelector(".control-stack");
@@ -17,10 +20,8 @@ renderHost=function(){
   const q=state.currentQuestion;
   const rows=q?q.answers.map((a,i)=>{
    const shown=state.revealed.includes(i);
-   const action=shown?"hide":"reveal";
-   const label=shown?"إخفاء":"كشف";
-   const allowed=state.phase==="playing";
-   return '<div class="host-answer-row"><div class="host-answer-copy"><b>'+String(i+1).padStart(2,"0")+'. '+esc(a.text)+'</b><small>'+Number(a.points||0)+' نقطة'+(shown?' · مكشوفة':' · مخفية')+'</small></div>'+(allowed?'<button class="'+(shown?'hide':'reveal')+'" data-host-answer="'+action+'" data-answer-index="'+i+'">'+label+'</button>':'<span class="small">للهوست</span>')+'</div>';
+   const allowed=state.phase==="playing"&&!shown;
+   return '<div class="host-answer-row"><div class="host-answer-copy"><b>'+String(i+1).padStart(2,"0")+'. '+esc(a.text)+'</b><small>'+Number(a.points||0)+' نقطة'+(shown?' · مكشوفة وثابتة':' · مخفية')+'</small></div>'+(allowed?'<button class="reveal" data-host-answer="reveal" data-answer-index="'+i+'">كشف الإجابة</button>':shown?'<span class="host-answer-locked">تم الكشف</span>':'<span class="small">للهوست</span>')+'</div>';
   }).join(""):'<div class="host-answer-empty">ابدأ سؤالًا لعرض الإجابات السرية هنا.</div>';
   const active=state.teams.find(t=>t.id===state.activeTeam);
   stack.insertAdjacentHTML("afterbegin",'<section class="host-answer-panel"><div class="host-answer-heading"><strong>لوحة الإجابات السرية — للهوست فقط</strong><span class="badge">'+(q?q.answers.length-state.revealed.length+' متبقية':'بانتظار السؤال')+'</span></div><div class="host-round-meta"><span>رصيد السؤال: '+Number(state.bank||0)+'</span><span>مضاعف الجولة: ×'+Number(state.multiplier||1)+'</span>'+(active?'<span class="team-turn-pill '+(active.id==="A"?"red":"blue")+'">الدور: '+esc(active.name)+'</span>':'')+'</div><div class="host-answer-list">'+rows+'</div></section>');
@@ -33,7 +34,7 @@ renderHost=function(){
 };
 app.addEventListener("click",e=>{
  const answer=e.target.closest("[data-host-answer]");
- if(answer){const i=Number(answer.dataset.answerIndex);act(answer.dataset.hostAnswer==="hide"?"hideAnswer":"reveal",{answerIndex:i});return;}
+ if(answer){const i=Number(answer.dataset.answerIndex);act("reveal",{answerIndex:i});return;}
  if(e.target.closest("[data-host-multiplier]")){act("setMultiplier",{multiplier:Number($("#ihyaaMultiplier").value)});return;}
  if(e.target.closest("[data-host-set-team]")){act("setActiveTeam",{team:$("#ihyaaTeamChoice").value});return;}
  if(e.target.closest("[data-host-strike]")){act("strike");return;}
