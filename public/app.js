@@ -32,7 +32,7 @@ function renderGame(){
   const skipped=result.reason==="skipped";
   phaseNotice='<section class="phase-banner '+(skipped?'neutral-banner':'result-banner')+'"><span class="phase-icon">'+(skipped?'Ⅱ':'🏆')+'</span><div><b>'+(skipped?'تم تخطي الجولة':'انتهت الجولة')+'</b><p>'+(skipped?'لم تُحتسب نقاط البنك.':(resultTeam?esc(resultTeam.name)+' حصل على ':'لم يحصل أي فريق على ')+Number(result.awarded||0)+' نقطة'+(result.multiplier>1?' (×'+result.multiplier+')':''))+'</p></div></section>';
  }
- const activeBanner=active&&["playing","steal"].includes(state.phase)?'<div class="active-turn"><span>الفريق صاحب الدور</span><b>'+esc(active.name)+'</b></div>':'';
+ const activeBanner=active&&state.phase==="playing"?'<div class="active-turn"><span>الفريق صاحب الدور</span><b>'+esc(active.name)+'</b></div>':'';
  shell("شاشة المباراة","PUBLIC GAME SCREEN",
   '<div class="game-stage">'+
    '<div class="teamboard">'+teamCard(state.teams[0])+'<div class="versus">VS</div>'+teamCard(state.teams[1])+'</div>'+
