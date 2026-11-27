@@ -47,7 +47,7 @@ const DEMO_QUESTIONS = [
 const freshState = () => ({
   room: "", status:"lobby", phase:"setup", round:1,
   teams:[{id:"A",name:"الفريق الأحمر",players:[],score:0},{id:"B",name:"الفريق الأزرق",players:[],score:0}],
-  categories:CATEGORIES, questions:DEMO_QUESTIONS, questionIndex:0, currentQuestion:null,
+  categories:CATEGORIES, questions:DEMO_QUESTIONS, questionIndex:0, currentQuestion:null, completedQuestions:[],
   activeTeam:null, faceoff:{firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null},
   revealed:[], strikes:0, maxStrikes:3, bank:0, multiplier:1, roundMultipliers:[1,2,3,3], roundHistory:[], roundResult:null, steal:{team:null,attempted:false,success:null,answer:null},
   timer:{duration:30,remaining:30,running:false}, fastMoney:{enabled:false,target:200,active:false,player:1,answers:[[],[]],seconds:20},
@@ -56,6 +56,7 @@ const freshState = () => ({
 
 function json(data,status=200){return new Response(JSON.stringify(data),{status,headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store"}})}
 function clone(v){return JSON.parse(JSON.stringify(v))}
+function archiveQuestion(s,result){if(!s.currentQuestion)return;const entry={round:s.round,question:clone(s.currentQuestion),revealed:[...(s.revealed||[])],faceoffAnswers:clone(s.faceoff?.answers||{}),result:clone(result||{})};s.completedQuestions=s.completedQuestions||[];if(!s.completedQuestions.some(x=>x.round===entry.round&&x.question?.id===entry.question.id))s.completedQuestions.push(entry);if(s.completedQuestions.length>30)s.completedQuestions.shift();}
 function safeRoom(v){return /^[A-Z0-9]{4,8}$/.test(v||"")}
 function cleanName(v,fallback){return String(v||fallback).trim().slice(0,32)||fallback}
 function normalizeAnswer(value){return String(value||"").toLowerCase().normalize("NFKD").replace(/[\u064B-\u065F\u0670\u0640]/g,"").replace(/[أإآٱ]/g,"ا").replace(/ى/g,"ي").replace(/[ؤئ]/g,"ء").replace(/[^\p{L}\p{N}]+/gu," ").trim().replace(/\s+/g," ")}
@@ -118,7 +119,7 @@ export class MatchRoom {
  publicState(includePrivate=false){
   if(!this.data)return null;
   const s=clone(this.data);
-  if(!includePrivate){delete s.history;delete s.log;const faceoffSelected=new Set(Object.values(s.faceoff?.answers||{}).filter(i=>Number.isInteger(i)));const mask=q=>q?({...q,answers:q.answers.map((a,i)=>s.revealed.includes(i)||(q.id===s.currentQuestion?.id&&faceoffSelected.has(i))?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);}
+  if(!includePrivate){delete s.history;delete s.log;const faceoffSelected=new Set(Object.values(s.faceoff?.answers||{}).filter(i=>Number.isInteger(i)));const mask=(q,visible=new Set())=>q?({...q,answers:q.answers.map((a,i)=>((q.id===s.currentQuestion?.id&&s.revealed.includes(i))||(q.id===s.currentQuestion?.id&&faceoffSelected.has(i))||visible.has(i))?a:{text:null,points:null,aliases:[]})}):null;s.questions=[];s.currentQuestion=mask(s.currentQuestion);s.completedQuestions=(s.completedQuestions||[]).map(entry=>{const visible=new Set([...(entry.revealed||[]),...Object.values(entry.faceoffAnswers||{}).filter(i=>Number.isInteger(i))]);return {...entry,question:mask(entry.question,visible)};});}
   return s;
  }
  async persist(){this.data.updatedAt=Date.now();await this.state.storage.put("match",this.data);}
@@ -167,14 +168,14 @@ export class MatchRoom {
    case "deductPoints":{if(["faceoff","choice","playing","steal"].includes(s.phase))throw Error("لا يمكن تعديل رصيد الفرق قبل انتهاء الجولة");const n=Number(a.points);if(!Number.isInteger(n)||n<=0||n>100000)throw Error("أدخل عدد نقاط صحيحًا أكبر من صفر");team(a.team).score=Math.max(0,team(a.team).score-n);this.logEvent("خصم نقاط",team(a.team).name+" -"+n);break;}
    case "adjustScore":{if(["faceoff","choice","playing","steal"].includes(s.phase))throw Error("لا يمكن تعديل رصيد الفرق قبل انتهاء الجولة");const n=Number(a.score);if(!Number.isInteger(n)||n<0||n>1000000)throw Error("النتيجة غير صالحة");team(a.team).score=n;this.logEvent("تعديل النتيجة",team(a.team).name+" = "+n);break;}
    case "timer": if(a.action==="start"){s.timer.running=true;this.state.storage.setAlarm(Date.now()+1000);}else if(a.action==="pause"){s.timer.running=false;this.state.storage.deleteAlarm();}else if(a.action==="reset"){s.timer.running=false;s.timer.remaining=s.timer.duration;this.state.storage.deleteAlarm();}else throw Error("أمر مؤقت غير صالح");this.logEvent("تحديث المؤقت",a.action);break;
-   case "skip": if(["setup","roundEnd","finished"].includes(s.phase))throw Error("لا يوجد سؤال نشط لتخطيه");if(s.phase==="steal")throw Error("يجب حسم فرصة السرقة قبل إنهاء الجولة");s.roundResult={round:s.round,bank:s.bank,multiplier:s.multiplier,awarded:0,winner:null,reason:"skipped"};s.roundHistory.push({...s.roundResult});s.bank=0;s.phase="roundEnd";s.status="roundEnd";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("تخطي السؤال","لم تُحتسب نقاط البنك");break;
+   case "skip": if(["setup","roundEnd","finished"].includes(s.phase))throw Error("لا يوجد سؤال نشط لتخطيه");if(s.phase==="steal")throw Error("يجب حسم فرصة السرقة قبل إنهاء الجولة");s.roundResult={round:s.round,bank:s.bank,multiplier:s.multiplier,awarded:0,winner:null,reason:"skipped"};archiveQuestion(s,s.roundResult);s.roundHistory.push({...s.roundResult});s.bank=0;s.phase="roundEnd";s.status="roundEnd";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("تخطي السؤال","لم تُحتسب نقاط البنك");break;
    case "next": if(s.phase!=="roundEnd")throw Error("يجب إنهاء الجولة الحالية أولًا");s.round++;s.multiplier=Number(a.multiplier)||s.roundMultipliers[s.round-1]||1;s.currentQuestion=null;s.roundResult=null;s.steal={team:null,attempted:false,success:null,answer:null};s.phase="setup";s.status="playing";s.activeTeam=null;s.revealed=[];s.strikes=0;s.bank=0;s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("الانتقال للسؤال التالي","الجولة "+s.round+" — المضاعف ×"+s.multiplier);break;
    case "finishMatch": if(s.phase==="steal")throw Error("احسم محاولة السرقة أولًا قبل إنهاء المباراة");if(["faceoff","choice","playing"].includes(s.phase))this.finishRound(s.activeTeam,"match-ended");s.status="finished";s.phase="finished";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("إنهاء المباراة");break;
    case "restartQuestion": if(!s.currentQuestion)throw Error("لا يوجد سؤال لإعادته");s.revealed=[];s.strikes=0;s.bank=0;s.roundResult=null;s.steal={team:null,attempted:false,success:null,answer:null};s.phase="faceoff";s.status="playing";s.activeTeam=null;s.faceoff={firstBuzz:null,answers:{A:null,B:null},winner:null,choice:null};this.logEvent("إعادة السؤال");break;
    default: throw Error("عملية غير مدعومة");
   }
  }
- finishRound(teamId,reason="completed",details={}){const s=this.data;if(s.phase==="roundEnd")return;const bank=Number(s.bank)||0;const multiplier=Number(s.multiplier)||1;const award=bank*multiplier;if(teamId){const t=s.teams.find(x=>x.id===teamId);if(t)t.score+=award;}s.roundResult={round:s.round,bank,multiplier,awarded:award,winner:teamId,reason,...details};s.roundHistory.push({round:s.round,bank,multiplier,awarded:award,winner:teamId,reason});s.bank=0;s.phase="roundEnd";s.status="roundEnd";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("انتهاء الجولة",teamId?"تم اعتماد "+award+" نقطة للفريق الفائز (×"+multiplier+")":"انتهت الجولة دون نقاط");}
+ finishRound(teamId,reason="completed",details={}){const s=this.data;if(s.phase==="roundEnd")return;const bank=Number(s.bank)||0;const multiplier=Number(s.multiplier)||1;const award=bank*multiplier;if(teamId){const t=s.teams.find(x=>x.id===teamId);if(t)t.score+=award;}s.roundResult={round:s.round,bank,multiplier,awarded:award,winner:teamId,reason,...details};archiveQuestion(s,s.roundResult);s.roundHistory.push({round:s.round,bank,multiplier,awarded:award,winner:teamId,reason});s.bank=0;s.phase="roundEnd";s.status="roundEnd";s.timer.running=false;this.state.storage.deleteAlarm();this.logEvent("انتهاء الجولة",teamId?"تم اعتماد "+award+" نقطة للفريق الفائز (×"+multiplier+")":"انتهت الجولة دون نقاط");}
  async alarm(){await this.ready;if(!this.data?.timer?.running)return;this.data.timer.remaining=Math.max(0,this.data.timer.remaining-1);if(this.data.timer.remaining===0){this.data.timer.running=false;this.logEvent("انتهاء الوقت");}else{await this.state.storage.setAlarm(Date.now()+1000);}await this.persist();this.broadcast();}
  onMessage(ws,raw,isHost){
   if(!isHost){try{ws.send(JSON.stringify({type:"error",error:"وضع العرض فقط"}))}catch{}return}
