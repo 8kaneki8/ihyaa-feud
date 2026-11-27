@@ -48,6 +48,7 @@ export default {
    if(!result.ok) return json({error:"تعذر إنشاء المباراة"},500);
    return json({room,hostKey:key});
   }
+  if(url.pathname==="/control") return env.ASSETS.fetch(new Request(new URL("/control.html",url),request));
   return env.ASSETS.fetch(request);
  }
 };
