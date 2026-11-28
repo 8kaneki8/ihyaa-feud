@@ -1,47 +1,75 @@
 const CATEGORIES = [
-  { id: "prophets", name: "الأنبياء والرسل" },
-  { id: "history", name: "التاريخ الإسلامي" },
-  { id: "quran", name: "القرآن الكريم" },
-  { id: "companions", name: "الصحابة" },
-  { id: "knowledge", name: "معلومات إسلامية" }
+  { id: "ten-promised", name: "العشرة المبشرون بالجنة" },
+  { id: "prophet-children", name: "أبناء الرسول ﷺ" },
+  { id: "first-muslims", name: "أوائل من دخلوا الإسلام" },
+  { id: "longest-surahs", name: "أطول سور القرآن" }
 ];
 
 const DEMO_QUESTIONS = [
-  // الأنبياء والرسل
-  { id:"p1", category:"prophets", question:"اذكر نبيًا من أولي العزم من الرسل", answers:[{text:"محمد ﷺ",points:30,aliases:["محمد","رسول الله"]},{text:"موسى عليه السلام",points:25,aliases:["موسى"]},{text:"إبراهيم عليه السلام",points:20,aliases:["ابراهيم"]},{text:"نوح عليه السلام",points:15,aliases:["نوح"]},{text:"عيسى عليه السلام",points:10,aliases:["عيسى","عيسي"]}], source:"القرآن الكريم: الأحزاب 7، والشورى 13، والأحقاف 35." },
-  { id:"p2", category:"prophets", question:"اذكر نبيًا ورد اسمه في اسم سورة من القرآن", answers:[{text:"يوسف عليه السلام",points:45,aliases:["يوسف"]},{text:"يونس عليه السلام",points:38,aliases:["يونس"]},{text:"هود عليه السلام",points:30,aliases:["هود"]},{text:"إبراهيم عليه السلام",points:22,aliases:["ابراهيم"]},{text:"نوح عليه السلام",points:15,aliases:["نوح"]}], source:"أسماء سور القرآن الكريم." },
-  { id:"p3", category:"prophets", question:"من أول الأنبياء؟", answers:[{text:"آدم عليه السلام",points:200,aliases:["آدم","ادم"]}], source:"آدم عليه السلام أول الأنبياء؛ ويُفرّق بين النبوة والرسالة، فنوح عليه السلام أول رسول إلى أهل الأرض بعد وقوع الشرك." },
-  { id:"p6", category:"prophets", question:"من أول رسول بعثه الله إلى أهل الأرض بعد وقوع الشرك؟", answers:[{text:"نوح عليه السلام",points:200,aliases:["نوح"]}], source:"حديث الشفاعة: يقال لنوح عليه السلام: أنت أول رسول بعثه الله إلى أهل الأرض؛ صحيح مسلم." },
-  { id:"p4", category:"prophets", question:"اذكر نبيًا أرسله الله إلى قومه فدعاهم إلى التوحيد", answers:[{text:"نوح عليه السلام",points:75,aliases:["نوح"]},{text:"هود عليه السلام",points:63,aliases:["هود"]},{text:"صالح عليه السلام",points:50,aliases:["صالح"]},{text:"شعيب عليه السلام",points:37,aliases:["شعيب"]},{text:"لوط عليه السلام",points:25,aliases:["لوط"]}], source:"سور هود والأعراف والشعراء وغيرها." },
-  { id:"p5", category:"prophets", question:"اذكر نبيًا ارتبطت قصته بمعجزة أو آية عظيمة", answers:[{text:"موسى عليه السلام — العصا",points:90,aliases:["موسى","العصا"]},{text:"صالح عليه السلام — الناقة",points:75,aliases:["صالح","الناقة"]},{text:"إبراهيم عليه السلام — النار",points:60,aliases:["ابراهيم","النار"]},{text:"عيسى عليه السلام — إبراء المرضى بإذن الله",points:45,aliases:["عيسى","إبراء الأكمه والأبرص"]},{text:"محمد ﷺ — القرآن الكريم",points:30,aliases:["محمد","القران","القرآن"]}], source:"القرآن الكريم؛ تذكر الإجابة مع القيد الوارد في النص: بإذن الله." },
-
-  // التاريخ الإسلامي
-  { id:"h1", category:"history", question:"اذكر مسجدًا له مكانة تاريخية كبيرة في الإسلام", answers:[{text:"المسجد الحرام",points:30,aliases:["الحرم المكي","الكعبة"]},{text:"المسجد النبوي",points:25,aliases:["مسجد الرسول"]},{text:"المسجد الأقصى",points:20,aliases:["الاقصى","بيت المقدس"]},{text:"مسجد قباء",points:15,aliases:["قباء"]},{text:"مسجد القبلتين",points:10,aliases:["القبلتين"]}], source:"السيرة النبوية ومصادر تاريخ المساجد." },
-  { id:"h2", category:"history", question:"اذكر غزوة من غزوات النبي ﷺ المشهورة", answers:[{text:"بدر",points:45,aliases:["غزوة بدر الكبرى"]},{text:"أحد",points:38,aliases:["غزوة احد"]},{text:"الخندق",points:30,aliases:["الأحزاب","غزوة الأحزاب"]},{text:"خيبر",points:22,aliases:["غزوة خيبر"]},{text:"حنين",points:15,aliases:["غزوة حنين"]}], source:"كتب السيرة النبوية." },
-  { id:"h3", category:"history", question:"اذكر حدثًا مهمًا وقع في السنة الأولى للهجرة", answers:[{text:"بناء المسجد النبوي",points:60,aliases:["بناء مسجد النبي"]},{text:"المؤاخاة بين المهاجرين والأنصار",points:50,aliases:["المؤاخاة"]},{text:"كتابة صحيفة المدينة",points:40,aliases:["وثيقة المدينة","دستور المدينة"]},{text:"النزول بقباء وبناء مسجدها",points:30,aliases:["بناء مسجد قباء","الوصول إلى قباء"]},{text:"تنظيم مجتمع المدينة",points:20,aliases:["تنظيم المدينة"]}], source:"كتب السيرة والتاريخ الإسلامي؛ ترتيب الأحداث التفصيلي قد يختلف بين المصادر." },
-  { id:"h4", category:"history", question:"اذكر مدينة كانت عاصمة أو مركزًا مهمًا في تاريخ الدولة الإسلامية", answers:[{text:"المدينة المنورة",points:75,aliases:["المدينة"]},{text:"دمشق",points:63,aliases:["الشام"]},{text:"بغداد",points:50,aliases:[]},{text:"القاهرة",points:37,aliases:[]},{text:"الكوفة",points:25,aliases:[]}], source:"كتب التاريخ الإسلامي." },
-  { id:"h5", category:"history", question:"اذكر صلحًا أو بيعة أو وثيقة بارزة في السيرة النبوية", answers:[{text:"صلح الحديبية",points:90,aliases:["الحديبية"]},{text:"بيعة العقبة الأولى",points:75,aliases:["العقبة الاولى"]},{text:"بيعة العقبة الثانية",points:60,aliases:["العقبة الثانية"]},{text:"بيعة الرضوان",points:45,aliases:["بيعة الشجرة"]},{text:"صحيفة المدينة",points:30,aliases:["وثيقة المدينة"]}], source:"كتب السيرة النبوية." },
-
-  // القرآن الكريم
-  { id:"q1", category:"quran", question:"اذكر سورة من أطول سور القرآن من حيث عدد الآيات", answers:[{text:"البقرة",points:30,aliases:["سورة البقرة"]},{text:"الأعراف",points:25,aliases:["الاعراف"]},{text:"آل عمران",points:20,aliases:["ال عمران"]},{text:"النساء",points:15,aliases:["سورة النساء"]},{text:"الأنعام",points:10,aliases:["الانعام"]}], source:"المصحف الشريف؛ الترتيب هنا بحسب عدد الآيات، والنقاط ترتيب تجريبي." },
-  { id:"q2", category:"quran", question:"اذكر سورة تبدأ بالحروف المقطعة: الم", answers:[{text:"البقرة",points:45,aliases:["سورة البقرة"]},{text:"آل عمران",points:36,aliases:["ال عمران"]},{text:"العنكبوت",points:27,aliases:["سورة العنكبوت"]},{text:"الروم",points:21,aliases:["سورة الروم"]},{text:"لقمان",points:14,aliases:["سورة لقمان"]},{text:"السجدة",points:7,aliases:["سورة السجدة"]}], source:"فواتح السور في المصحف الشريف؛ توجد سورة أخرى تبدأ بـ(الم) وهي السجدة." },
-  { id:"q3", category:"quran", question:"اذكر سورة سُمّيت باسم حيوان", answers:[{text:"البقرة",points:60,aliases:["سورة البقرة"]},{text:"النحل",points:50,aliases:["سورة النحل"]},{text:"النمل",points:40,aliases:["سورة النمل"]},{text:"العنكبوت",points:30,aliases:["سورة العنكبوت"]},{text:"الفيل",points:20,aliases:["سورة الفيل"]}], source:"أسماء سور القرآن الكريم." },
-  { id:"q4", category:"quran", question:"اذكر سورة افتتحت بالحمد لله", answers:[{text:"الفاتحة",points:75,aliases:["سورة الفاتحة"]},{text:"الأنعام",points:63,aliases:["الانعام"]},{text:"الكهف",points:50,aliases:["سورة الكهف"]},{text:"سبأ",points:37,aliases:["سورة سبأ"]},{text:"فاطر",points:25,aliases:["سورة فاطر"]}], source:"فواتح سور القرآن الكريم." },
-  { id:"q5", category:"quran", question:"اذكر سورة من السور التي سُمّيت باسم نبي", answers:[{text:"يوسف",points:90,aliases:["سورة يوسف"]},{text:"يونس",points:72,aliases:["سورة يونس"]},{text:"هود",points:54,aliases:["سورة هود"]},{text:"إبراهيم",points:42,aliases:["ابراهيم","سورة ابراهيم"]},{text:"نوح",points:27,aliases:["سورة نوح"]},{text:"محمد",points:15,aliases:["سورة محمد"]}], source:"أسماء سور القرآن الكريم؛ توجد أيضًا سورة محمد." },
-
-  // الصحابة
-  { id:"c1", category:"companions", question:"اذكر واحدًا من السابقين إلى الإسلام", answers:[{text:"خديجة بنت خويلد",points:30,aliases:["خديجة"]},{text:"أبو بكر الصديق",points:25,aliases:["ابو بكر","أبو بكر"]},{text:"علي بن أبي طالب",points:20,aliases:["علي","علي بن ابي طالب"]},{text:"زيد بن حارثة",points:15,aliases:["زيد"]},{text:"عثمان بن عفان",points:10,aliases:["عثمان"]}], source:"كتب السيرة؛ ترتيب أوائل المسلمين يختلف بحسب الفئة، والسؤال يقبل أي اسم من السابقين." },
-  { id:"c2", category:"companions", question:"اذكر واحدًا من الخلفاء الراشدين", answers:[{text:"أبو بكر الصديق",points:60,aliases:["ابو بكر","أبو بكر"]},{text:"عمر بن الخطاب",points:45,aliases:["عمر"]},{text:"عثمان بن عفان",points:30,aliases:["عثمان"]},{text:"علي بن أبي طالب",points:15,aliases:["علي","علي بن ابي طالب"]}], source:"الأربعة الأولون هم الخلفاء الراشدون؛ أُدرج الحسن بن علي خامسًا في الإجابات المقبولة لورود خلافةٍ قصيرة له." },
-  { id:"c3", category:"companions", question:"اذكر صحابيًا من العشرة المبشرين بالجنة", answers:[{text:"أبو بكر الصديق",points:50,aliases:["ابو بكر","أبو بكر"]},{text:"عمر بن الخطاب",points:36,aliases:["عمر"]},{text:"عثمان بن عفان",points:28,aliases:["عثمان"]},{text:"علي بن أبي طالب",points:24,aliases:["علي","علي بن ابي طالب"]},{text:"طلحة بن عبيد الله",points:20,aliases:["طلحة"]},{text:"الزبير بن العوام",points:14,aliases:["الزبير"]},{text:"عبد الرحمن بن عوف",points:10,aliases:["عبدالرحمن بن عوف"]},{text:"سعد بن أبي وقاص",points:8,aliases:["سعد بن ابي وقاص","سعد"]},{text:"سعيد بن زيد",points:6,aliases:["سعيد"]},{text:"أبو عبيدة بن الجراح",points:4,aliases:["ابو عبيدة","أبو عبيدة"]}], source:"حديث العشرة المبشرين بالجنة؛ صحيح الترمذي وغيره." },
-  { id:"c4", category:"companions", question:"اذكر صحابيًا اشتهر بلقب معروف", answers:[{text:"أبو بكر — الصديق",points:75,aliases:["ابو بكر الصديق","الصديق"]},{text:"عمر — الفاروق",points:63,aliases:["عمر الفاروق","الفاروق"]},{text:"حمزة — أسد الله",points:50,aliases:["حمزة","اسد الله"]},{text:"خالد بن الوليد — سيف الله",points:37,aliases:["خالد","سيف الله"]},{text:"بلال — مؤذن الرسول",points:25,aliases:["بلال بن رباح","بلال"]}], source:"كتب التراجم والسيرة؛ الألقاب المشهورة للصحابة." },
-  { id:"c5", category:"companions", question:"اذكر صحابيًا عُرف بكثرة رواية الحديث", answers:[{text:"أبو هريرة",points:90,aliases:["ابو هريرة"]},{text:"عبد الله بن عمر",points:75,aliases:["ابن عمر","عبدالله بن عمر"]},{text:"أنس بن مالك",points:60,aliases:["انس"]},{text:"عائشة بنت أبي بكر",points:45,aliases:["عائشة","عائشه"]},{text:"عبد الله بن عباس",points:30,aliases:["ابن عباس","عبدالله بن عباس"]}], source:"كتب الحديث وعلوم الرجال؛ من أشهر المكثرين من رواية الحديث." },
-
-  // معلومات إسلامية عامة
-  { id:"k1", category:"knowledge", question:"اذكر ركنًا من أركان الإسلام", answers:[{text:"الشهادتان",points:30,aliases:["الشهادة","شهادة أن لا إله إلا الله"]},{text:"إقامة الصلاة",points:25,aliases:["الصلاة"]},{text:"إيتاء الزكاة",points:20,aliases:["الزكاة"]},{text:"صوم رمضان",points:15,aliases:["الصيام","الصوم"]},{text:"حج البيت",points:10,aliases:["الحج"]}], source:"حديث بني الإسلام على خمس — صحيح البخاري وصحيح مسلم." },
-  { id:"k2", category:"knowledge", question:"اذكر ركنًا من أركان الإيمان", answers:[{text:"الإيمان بالله",points:45,aliases:["الله"]},{text:"الإيمان بالملائكة",points:36,aliases:["الملائكة"]},{text:"الإيمان بالكتب",points:27,aliases:["الكتب السماوية"]},{text:"الإيمان بالرسل",points:21,aliases:["الرسل"]},{text:"الإيمان باليوم الآخر",points:14,aliases:["اليوم الاخر"]},{text:"الإيمان بالقدر خيره وشره",points:7,aliases:["القدر","القضاء والقدر"]}], source:"حديث جبريل — صحيح مسلم؛ لم تُدرج الإجابة السادسة (القدر) ضمن هذه العينة." },
-  { id:"k3", category:"knowledge", question:"اذكر شهرًا من الأشهر الحُرُم", answers:[{text:"ذو القعدة",points:70,aliases:["ذي القعدة"]},{text:"ذو الحجة",points:60,aliases:["ذي الحجة"]},{text:"المحرم",points:40,aliases:["محرّم"]},{text:"رجب",points:30,aliases:[]}], source:"الأشهر الحرم أربعة: ذو القعدة وذو الحجة والمحرم ورجب." },
-  { id:"k4", category:"knowledge", question:"اذكر صلاة من الصلوات المفروضة", answers:[{text:"الفجر",points:75,aliases:["صلاة الفجر"]},{text:"الظهر",points:63,aliases:["صلاة الظهر"]},{text:"العصر",points:50,aliases:["صلاة العصر"]},{text:"المغرب",points:37,aliases:["صلاة المغرب"]},{text:"العشاء",points:25,aliases:["صلاة العشاء"]}], source:"الصلوات الخمس المفروضة." },
-  { id:"k5", category:"knowledge", question:"اذكر عبادة أو شعيرة ترتبط بشهر رمضان", answers:[{text:"الصيام",points:90,aliases:["صوم رمضان"]},{text:"صلاة التراويح",points:75,aliases:["التراويح","قيام رمضان"]},{text:"زكاة الفطر",points:60,aliases:["الفطرة"]},{text:"الاعتكاف",points:45,aliases:[]},{text:"تحري ليلة القدر",points:30,aliases:["ليلة القدر","قيام ليلة القدر"]}], source:"أحكام وفضائل شهر رمضان في القرآن والسنة." }
+  {
+    id: "rank-ten-promised",
+    category: "ten-promised",
+    question: "رتّب العشرة المبشّرين بالجنة بحسب ترتيب أسمائهم في الحديث",
+    answers: [
+      {text:"أبو بكر الصديق",points:30,aliases:["أبو بكر","ابو بكر"]},
+      {text:"عمر بن الخطاب",points:28,aliases:["عمر"]},
+      {text:"عثمان بن عفان",points:26,aliases:["عثمان"]},
+      {text:"علي بن أبي طالب",points:24,aliases:["علي","علي بن ابي طالب"]},
+      {text:"طلحة بن عبيد الله",points:22,aliases:["طلحة"]},
+      {text:"الزبير بن العوام",points:20,aliases:["الزبير"]},
+      {text:"عبد الرحمن بن عوف",points:18,aliases:["عبدالرحمن بن عوف"]},
+      {text:"سعد بن أبي وقاص",points:16,aliases:["سعد","سعد بن ابي وقاص"]},
+      {text:"سعيد بن زيد",points:14,aliases:["سعيد"]},
+      {text:"أبو عبيدة بن الجراح",points:12,aliases:["أبو عبيدة","ابو عبيدة"]}
+    ],
+    source:"حديث عبد الرحمن بن عوف في سنن الترمذي (3747). هذا ترتيب ورود الأسماء في الحديث، وليس ترتيبًا تفاضليًا بين الصحابة."
+  },
+  {
+    id: "rank-prophet-children",
+    category: "prophet-children",
+    question: "رتّب أبناء النبي ﷺ بحسب ترتيب الولادة على القول المعتمد في مصدر المسابقة",
+    answers: [
+      {text:"القاسم",points:40,aliases:["القاسم بن رسول الله"]},
+      {text:"زينب",points:35,aliases:["زينب بنت رسول الله"]},
+      {text:"رقية",points:30,aliases:["رقية بنت رسول الله"]},
+      {text:"فاطمة",points:25,aliases:["فاطمة الزهراء"]},
+      {text:"أم كلثوم",points:20,aliases:["ام كلثوم"]},
+      {text:"عبد الله",points:15,aliases:["عبدالله","عبد الله الطيب","الطيب والطاهر"]},
+      {text:"إبراهيم",points:10,aliases:["ابراهيم","إبراهيم ابن النبي"]}
+    ],
+    source:"السيرة النبوية، كتاب السيرة الذاتية الصادر عن الأزهر. ترتيب المولد فيه: القاسم، زينب، رقية، فاطمة، أم كلثوم، عبد الله، إبراهيم. يوجد خلاف في ترتيب بعض البنات بين كتب السيرة."
+  },
+  {
+    id: "rank-first-muslims",
+    category: "first-muslims",
+    question: "اذكر أوائل من دخلوا الإسلام وفق ترتيب ابن إسحاق",
+    answers: [
+      {text:"خديجة بنت خويلد",points:60,aliases:["خديجة","أم المؤمنين خديجة"]},
+      {text:"علي بن أبي طالب",points:50,aliases:["علي","علي بن ابي طالب"]},
+      {text:"زيد بن حارثة",points:40,aliases:["زيد"]},
+      {text:"أبو بكر الصديق",points:30,aliases:["أبو بكر","ابو بكر"]},
+      {text:"عثمان بن عفان",points:20,aliases:["عثمان"]}
+    ],
+    source:"ترتيب ابن إسحاق كما نقله أهل العلم: خديجة، ثم علي، ثم زيد، ثم أبو بكر؛ ثم يذكر من أسلم بدعوة أبي بكر عثمان والزبير وعبد الرحمن بن عوف وسعد بن أبي وقاص وطلحة. تحديد «الخامس» هنا وفق ترتيب الرواية، وليس محل اتفاق على ترتيب زمني قطعي."
+  },
+  {
+    id: "rank-longest-surahs",
+    category: "longest-surahs",
+    question: "رتّب أطول عشر سور في القرآن الكريم من حيث عدد الآيات",
+    answers: [
+      {text:"سورة البقرة — 286 آية",points:30,aliases:["البقرة","سورة البقرة"]},
+      {text:"سورة الشعراء — 227 آية",points:28,aliases:["الشعراء","سورة الشعراء"]},
+      {text:"سورة الأعراف — 206 آيات",points:26,aliases:["الأعراف","الاعراف"]},
+      {text:"سورة آل عمران — 200 آية",points:24,aliases:["آل عمران","ال عمران"]},
+      {text:"سورة الصافات — 182 آية",points:22,aliases:["الصافات"]},
+      {text:"سورة النساء — 176 آية",points:20,aliases:["النساء"]},
+      {text:"سورة الأنعام — 165 آية",points:18,aliases:["الأنعام","الانعام"]},
+      {text:"سورة طه — 135 آية",points:16,aliases:["طه"]},
+      {text:"سورة التوبة — 129 آية",points:14,aliases:["التوبة","براءة"]},
+      {text:"سورة النحل — 128 آية",points:12,aliases:["النحل"]}
+    ],
+    source:"ترتيب السور تنازليًا بحسب عدد الآيات في إحصاءات مصحف المدينة برواية حفص."
+  }
 ];
 
 const freshState = () => ({
